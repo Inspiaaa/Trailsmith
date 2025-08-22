@@ -1,0 +1,50 @@
+use std::fs;
+use std::fs::File;
+use std::path::PathBuf;
+use clap::Parser;
+
+mod convert;
+
+// Src for the GPX-->KML code: https://github.com/vilaureu/gpx_kml_convert/tree/master
+
+#[derive(Parser)]
+struct Cli {
+    /// Input GPX file
+    input: PathBuf,
+
+    /// Output KML file / directory path
+    #[arg(short = 'o', long = "output")]
+    output: Option<PathBuf>,
+
+    /// Disable printing
+    #[arg(short = 'q', long = "quiet")]
+    quiet: bool,
+}
+
+fn main() {
+    let args = Cli::parse();
+
+    if !args.quiet { println!("Processing paths..."); }
+
+    let input_path = args.input;
+    let mut output_path = args.output.unwrap_or_else(|| {
+        input_path.with_extension("kml")
+    });
+
+    if output_path.is_dir() {
+        output_path = output_path.join(input_path.file_name().unwrap()).with_extension("kml");
+    }
+
+    if !args.quiet { println!("Loading files..."); }
+
+    let input_file_contents = fs::read(input_path).expect("Could not read input file.");
+    let output_file = File::create(output_path.as_path()).expect("Unable to create output file.");
+
+    if !args.quiet { println!("Converting..."); }
+
+    convert::convert(input_file_contents.as_slice(), output_file).unwrap();
+
+    if !args.quiet {
+        println!("Finished conversion. Wrote output to '{}'.", output_path.display())
+    }
+}
