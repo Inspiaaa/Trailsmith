@@ -23,9 +23,9 @@ pub fn simplify_all_tracks_in_file(
     solver_config: &SolverConfig,
 ) {
     info!("Parsing GPX...");
-    let mut gpx = gpx::read(input_file).unwrap();
+    let mut gpx = gpx::read(input_file).expect("Failed to parse GPX file.");
     simplify_all_tracks_in_gpx_mut(&mut gpx, solver_config);
-    gpx::write(&gpx, output_file).unwrap();
+    gpx::write(&gpx, output_file).expect("Failed to write GPX file.");
 }
 
 pub fn simplify_all_tracks_in_gpx(gpx: gpx::Gpx, solver_config: &SolverConfig) -> gpx::Gpx {
