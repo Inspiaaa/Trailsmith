@@ -39,6 +39,10 @@ struct Cli {
     #[arg(short = 'o', long = "output")]
     output: PathBuf,
 
+    /// Quiet: Disable logging.
+    #[arg(short = 'q', long = "quiet")]
+    quiet: bool,
+
     /// Output file encoding.
     #[arg(short = 'e', long = "encoding", default_value = "ascii")]
     encoding: EncodingOption,
@@ -47,17 +51,17 @@ struct Cli {
     #[arg(short = 's', long = "strategy", default_value = "ignore")]
     strategy: ErrorStrategy,
 
-    /// Quiet: Disable logging.
-    #[arg(short = 'q', long = "quiet")]
-    quiet: bool,
-
     /// Sets the "creator" field (software / person who made the GPX file).
     #[arg(long = "set-creator")]
     set_creator: Option<String>,
 
-    /// Removes all metadata.
-    #[arg(long = "remove-metadata")]
-    remove_metadata: bool,
+    /// Sets the GPX file format version.
+    #[arg(long = "set-version", default_value = "1.1")]
+    set_version: VersionOption,
+
+    /// Interactively rename each track.
+    #[arg(long = "rename-tracks")]
+    rename_tracks: bool,
 
     /// Removes all waypoints.
     #[arg(long = "remove-waypoints")]
@@ -71,19 +75,15 @@ struct Cli {
     #[arg(long = "remove-routes")]
     remove_routes: bool,
 
-    /// Sets the GPX file format version.
-    #[arg(long = "set-version", default_value = "1.1")]
-    set_version: VersionOption,
+    /// Removes all "general" GPX metadata.
+    #[arg(long = "remove-metadata")]
+    remove_metadata: bool,
 
-    /// Interactively rename each track.
-    #[arg(long = "rename-tracks")]
-    rename_tracks: bool,
-
-    /// Removes all metadata (except for the name) from each track.
+    /// Removes all general metadata (except for the name) from each track.
     #[arg(long = "remove-track-metadata")]
     remove_track_metadata: bool,
 
-    /// Remove metadata (except for the name) from each route.
+    /// Remove all general metadata (except for the name) from each route.
     #[arg(long = "remove-route-metadata")]
     remove_route_metadata: bool,
 
