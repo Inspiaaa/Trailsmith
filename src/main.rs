@@ -16,7 +16,7 @@ struct Cli {
     #[arg(short = 'o', long = "output")]
     output: Option<PathBuf>,
 
-    /// Disable printing
+    /// Quite: Disable logging
     #[arg(short = 'q', long = "quiet")]
     quiet: bool,
 }
