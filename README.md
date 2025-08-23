@@ -1,5 +1,7 @@
 # CLI GPX Tools
 
+GpxTools is a collection of lightweight, fast, and easy-to-use command-line utilities for processing and transforming GPX files, built with Rust. Whether you're cleaning up GPS data, converting formats, or optimizing tracks, GpxTools helps you streamline your GPX workflows with minimal effort.
+
 ## Reducing Track Point Count
 
 **Example:** Reduce the point count of each track to 500 points:
