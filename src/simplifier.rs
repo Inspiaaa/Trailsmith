@@ -47,13 +47,13 @@ fn simplify_track(track: &gpx::Track, config: &SolverConfig) -> gpx::Track {
 
     if point_count <= config.max_points {
         info!(
-            "  Track already has {point_count} <= {} points.",
+            "Track already has {point_count} <= {} points.",
             config.max_points
         );
         return track.clone();
     }
 
-    info!("Simplifying track...");
+    info!("Simplifying track ({point_count} points)...");
 
     // We perform a binary search to find an optimal epsilon value for simplification.
 
