@@ -35,7 +35,7 @@ pub fn simplify_all_tracks_in_gpx(gpx: gpx::Gpx, solver_config: &SolverConfig) -
 }
 
 pub fn simplify_all_tracks_in_gpx_mut(gpx: &mut gpx::Gpx, solver_config: &SolverConfig) {
-    info!("Found {} track(s)", gpx.tracks.len());
+    info!("Found {} track(s):", gpx.tracks.len());
 
     for track in gpx.tracks.iter_mut() {
         *track = simplify_track(track, solver_config);
