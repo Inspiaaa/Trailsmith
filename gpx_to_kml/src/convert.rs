@@ -44,8 +44,6 @@ const DEFAULT_OPEN: &str = "1";
 /// Default value for tessellating lines in KML.
 const DEFAULT_TESSELLATE: bool = true;
 
-const DEFAULT_LINE_COLOR: &str = "#FF4136FF";
-
 /// Use double precision for coordinate values.
 type CoordValue = f64;
 
@@ -59,6 +57,14 @@ pub enum Error {
     #[error("writing KML failed: {0}")]
     Kml(#[from] kml::Error),
 }
+
+#[derive(Clone)]
+pub struct LineStyleConfig {
+    pub color: String,
+    pub width: f64,
+}
+
+const LINE_STYLE_NAME: &str = "defaultLineStyle";
 
 /// Read a GPX file and write a KML file.
 ///
@@ -87,13 +93,13 @@ pub enum Error {
 /// assert!(kml.contains("48.858222"));
 /// assert!(kml.contains("Eiffel Tower"));
 /// ```
-pub fn convert(source: impl Read, mut sink: impl io::Write) -> Result<(), Error> {
+pub fn convert(source: impl Read, mut sink: impl io::Write, line_style: &LineStyleConfig) -> Result<(), Error> {
     let gpx = gpx::read(source)?;
 
     let mut elements = vec![simple_kelem("open", DEFAULT_OPEN)];
     push_metadata(gpx.metadata.unwrap_or_default(), gpx.creator, &mut elements);
 
-    elements.push(create_red_line_style());
+    elements.push(create_red_line_style(line_style));
 
     for waypoint in gpx.waypoints {
         elements.push(convert_waypoint(waypoint));
@@ -129,16 +135,16 @@ pub fn convert(source: impl Read, mut sink: impl io::Write) -> Result<(), Error>
     Ok(())
 }
 
-fn create_red_line_style() -> Kml {
+fn create_red_line_style(line_style: &LineStyleConfig) -> Kml {
     let line_style = LineStyle {
-        color: DEFAULT_LINE_COLOR.to_string(),
+        color: line_style.color.clone(),
         color_mode: ColorMode::Normal,
-        width: 1.0,
+        width: line_style.width,
         ..Default::default()
     };
 
     Kml::Style(Style {
-        id: Some("redLine".to_string()),
+        id: Some(LINE_STYLE_NAME.to_string()),
         line: Some(line_style),
         ..Default::default()
     })
@@ -388,7 +394,7 @@ fn create_placemark(args: PlacemarkArgs) -> Kml<CoordValue> {
         name: args.name,
         description: Some(description).filter(|d| !d.is_empty()),
         geometry: Some(args.geometry),
-        style_url: Some("#redLine".to_string()),
+        style_url: Some("#".to_string() + LINE_STYLE_NAME),
         children,
         ..Default::default()
     })
