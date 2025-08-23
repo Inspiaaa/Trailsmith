@@ -35,7 +35,7 @@ fn main() {
         output_path = output_path.join(input_path.file_name().unwrap()).with_extension("kml");
     }
 
-    if !args.quiet { println!("Loading files..."); }
+    if !args.quiet { println!("Loading input file..."); }
 
     let input_file_contents = fs::read(input_path).expect("Could not read input file.");
     let output_file = File::create(output_path.as_path()).expect("Unable to create output file.");
