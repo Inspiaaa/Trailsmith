@@ -1,4 +1,4 @@
-use crate::simplifier::SimplificationMethod;
+use crate::simplifier::{SimplificationMethod, SolverConfig};
 use clap::{Parser, ValueEnum};
 use std::fs;
 use std::fs::File;
@@ -8,8 +8,11 @@ use log::info;
 
 mod simplifier;
 
+const DEFAULT_VW_EPSILON: f64 = 0.0001;
+const DEFAULT_RDP_EPSILON: f64 = 0.001;
+
 #[derive(ValueEnum, Clone, Debug)]
-enum Algorithm {
+enum AlgorithmOption {
     /// Ramer-Douglas-Peucker
     RDP,
     /// Visvalingam-Whyatt
@@ -35,7 +38,11 @@ struct Cli {
 
     /// Simplification algorithm
     #[arg(short = 'a', long = "algorithm", default_value = "rdp")]
-    algorithm: Algorithm,
+    algorithm: AlgorithmOption,
+
+    /// Initial epsilon value for simplification
+    #[arg(short = 'e', long = "epsilon")]
+    epsilon: Option<f64>,
 
     /// Quiet: Disable logging
     #[arg(short = 'q', long = "quiet")]
@@ -76,16 +83,26 @@ fn main() {
     info!("Simplifying...");
 
     let method = match args.algorithm {
-        Algorithm::RDP => SimplificationMethod::RamerDouglasPeucker,
-        Algorithm::VW => SimplificationMethod::VisvalingamWhyatt,
+        AlgorithmOption::RDP => SimplificationMethod::RamerDouglasPeucker,
+        AlgorithmOption::VW => SimplificationMethod::VisvalingamWhyatt,
+    };
+
+    let initial_epsilon = args.epsilon.unwrap_or(match args.algorithm {
+        AlgorithmOption::RDP => DEFAULT_RDP_EPSILON,
+        AlgorithmOption::VW => DEFAULT_VW_EPSILON,
+    });
+
+    let solver_config = SolverConfig {
+        max_points: args.max_points,
+        max_iterations: args.max_iterations,
+        method,
+        initial_epsilon
     };
 
     simplifier::simplify_all_tracks_in_file(
         input_file_contents.as_slice(),
         output_file,
-        args.max_points,
-        args.max_iterations,
-        method,
+        &solver_config
     );
 
     info!("Finished simplification. Wrote output to '{}'.", output_path.display())

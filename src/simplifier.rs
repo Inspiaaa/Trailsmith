@@ -1,7 +1,7 @@
 use geo;
 use geo::{LineString, Point, SimplifyIdx, SimplifyVwIdx};
-use std::io;
 use log::info;
+use std::io;
 
 #[derive(Copy, Clone)]
 pub enum SimplificationMethod {
@@ -9,115 +9,144 @@ pub enum SimplificationMethod {
     VisvalingamWhyatt,
 }
 
+#[derive(Clone)]
+pub struct SolverConfig {
+    pub max_points: u32,
+    pub max_iterations: u32,
+    pub method: SimplificationMethod,
+    pub initial_epsilon: f64,
+}
+
 pub fn simplify_all_tracks_in_file(
     input_file: impl io::Read,
     output_file: impl io::Write,
-    max_points: u32,
-    max_iterations: u32,
-    method: SimplificationMethod,
+    solver_config: &SolverConfig,
 ) {
     info!("Parsing GPX...");
     let mut gpx = gpx::read(input_file).unwrap();
-    simplify_all_tracks_in_gpx_mut(&mut gpx, max_points, max_iterations, method);
+    simplify_all_tracks_in_gpx_mut(&mut gpx, solver_config);
     gpx::write(&gpx, output_file).unwrap();
 }
 
-pub fn simplify_all_tracks_in_gpx(
-    gpx: gpx::Gpx,
-    max_points: u32,
-    max_iterations: u32,
-    method: SimplificationMethod,
-) -> gpx::Gpx {
+pub fn simplify_all_tracks_in_gpx(gpx: gpx::Gpx, solver_config: &SolverConfig) -> gpx::Gpx {
     let mut result = gpx.clone();
-
-    simplify_all_tracks_in_gpx_mut(&mut result, max_points, max_iterations, method);
-
+    simplify_all_tracks_in_gpx_mut(&mut result, solver_config);
     result
 }
 
-pub fn simplify_all_tracks_in_gpx_mut(
-    gpx: &mut gpx::Gpx,
-    max_points: u32,
-    max_iterations: u32,
-    method: SimplificationMethod,
-) {
+pub fn simplify_all_tracks_in_gpx_mut(gpx: &mut gpx::Gpx, solver_config: &SolverConfig) {
     info!("Found {} track(s)", gpx.tracks.len());
 
     for track in gpx.tracks.iter_mut() {
-        *track = simplify_track(track, max_points, max_iterations, method);
+        *track = simplify_track(track, solver_config);
     }
 }
 
-fn simplify_track(
-    track: &gpx::Track,
-    max_points: u32,
-    max_iterations: u32,
-    method: SimplificationMethod,
-) -> gpx::Track {
+fn simplify_track(track: &gpx::Track, config: &SolverConfig) -> gpx::Track {
     let point_count = count_points_in_track(track);
 
-    if point_count <= max_points {
-        info!("  Track already has {point_count} <= {max_points} points.");
+    if point_count <= config.max_points {
+        info!(
+            "  Track already has {point_count} <= {} points.",
+            config.max_points
+        );
         return track.clone();
     }
 
-    info!("  Simplifying track...");
+    info!("Simplifying track...");
 
+    // We perform a binary search to find an optimal epsilon value for simplification.
+
+    // initial_epsilon = middle between min and max = (min + max) / 2
+    // => Solve for max_epsilon.
     let mut min_epsilon: f64 = 0.0;
-    let mut max_epsilon: f64 = 0.01;
+    let mut max_epsilon: f64 = config.initial_epsilon * 2.0 - min_epsilon;
 
     let mut iteration_count: u32 = 0;
 
-    // Binary search to find the epsilon that maximises the number of points.
+    let segments_as_lines: Vec<LineString> = track
+        .segments
+        .iter()
+        .map(get_line_string_from_segment)
+        .collect();
+
+    let mut best_segment_indices: Vec<Vec<usize>>;
+    let mut best_point_count: u32;
+
+    // Find a suitable upper bound by increasing the max_epsilon parameter.
+    info!("  Finding upper bound for epsilon...");
     loop {
+        iteration_count += 1;
+
+        best_segment_indices = simplify_segment_lines(&segments_as_lines, max_epsilon, config.method);
+        best_point_count = count_points_in_simplified_segment_indices(&best_segment_indices);
+
+        info!("    [{iteration_count}] {best_point_count} points for epsilon={max_epsilon}");
+
+        if best_point_count <= config.max_points
+            || iteration_count >= config.max_iterations
+        {
+            break;
+        }
+
+        max_epsilon *= 2.0;
+    }
+
+    info!("  Finding optimal epsilon...");
+    // Perform binary search to find the best epsilon parameter to maximise the point count
+    // within the given constraints.
+    while iteration_count < config.max_iterations && best_point_count < config.max_points {
         iteration_count += 1;
 
         let epsilon = (max_epsilon + min_epsilon) / 2.0;
 
-        let simplified_indices = simplify_segments(&track, epsilon, method);
+        let simplified_indices = simplify_segment_lines(&segments_as_lines, epsilon, config.method);
         let new_point_count = count_points_in_simplified_segment_indices(&simplified_indices);
 
-        info!("    [{iteration_count}] {new_point_count} points for epsilon={epsilon}");
+        info!("    [{iteration_count}] {new_point_count} points for epsilon={max_epsilon}.");
 
-        // TODO: Handle the max iterations case differently (return best value, not the current
-        // value which may be too large!)
-        // TODO: Add option for min and max epsilon
-        if new_point_count == max_points || iteration_count >= max_iterations {
-            let segments: Vec<gpx::TrackSegment> = track
-                .segments
-                .iter()
-                .zip(simplified_indices.iter())
-                .map(|(segment, indices)| create_segment_from_indices(segment, indices))
-                .collect();
-
-            return gpx::Track {
-                segments,
-                ..track.clone()
-            };
+        if (best_point_count > config.max_points && new_point_count < best_point_count)
+            || (new_point_count > best_point_count && new_point_count <= config.max_points)
+        {
+            best_segment_indices = simplified_indices;
+            best_point_count = new_point_count;
         }
 
-        if new_point_count < max_points {
+        if new_point_count < config.max_points {
             max_epsilon = epsilon;
         } else {
             min_epsilon = epsilon;
         }
     }
+
+    if best_point_count <= config.max_points {
+        info!("  Reduced track to {best_point_count} points.");
+    } else {
+        info!("  Failed to reduce the point count sufficiently. Consider increasing the number of iterations.")
+    }
+
+    let segments: Vec<gpx::TrackSegment> = track
+        .segments
+        .iter()
+        .zip(best_segment_indices.iter())
+        .map(|(segment, indices)| create_segment_from_indices(segment, indices))
+        .collect();
+
+    gpx::Track {
+        segments,
+        ..track.clone()
+    }
 }
 
 /// Returns for each segment the indices of the points that were kept.
-fn simplify_segments(
-    track: &gpx::Track,
+fn simplify_segment_lines(
+    segments_as_lines: &Vec<LineString>,
     epsilon: f64,
     method: SimplificationMethod,
 ) -> Vec<Vec<usize>> {
-    track
-        .segments
+    segments_as_lines
         .iter()
-        .map(|segment| {
-            let line = get_line_string_from_segment(segment);
-            let simplified_indices = simplify_line_string(&line, epsilon, method);
-            simplified_indices
-        })
+        .map(|line| simplify_line_string(line, epsilon, method))
         .collect()
 }
 
@@ -150,10 +179,7 @@ fn count_points_in_simplified_segment_indices(indices_per_segment: &Vec<Vec<usiz
         .sum()
 }
 
-fn create_segment_from_indices(
-    original: &gpx::TrackSegment,
-    indices: &Vec<usize>,
-) -> gpx::TrackSegment {
+fn create_segment_from_indices(original: &gpx::TrackSegment, indices: &Vec<usize>, ) -> gpx::TrackSegment {
     let points = indices
         .iter()
         .map(|i| original.points[*i].clone())
