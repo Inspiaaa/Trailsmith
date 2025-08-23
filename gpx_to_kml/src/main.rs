@@ -22,8 +22,7 @@ struct Cli {
     #[arg(short = 'q', long = "quiet")]
     quiet: bool,
 
-    /// Line color.
-    /// Remember to include the alpha value at the end, e.g. "#ff0000ff" for red.
+    /// Line color. Remember to include the alpha value at the end.
     #[arg(short = 'c', long = "color", default_value = "#FF4136FF")]
     line_color: String,
 
