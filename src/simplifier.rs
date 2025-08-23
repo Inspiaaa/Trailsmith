@@ -45,15 +45,17 @@ pub fn simplify_all_tracks_in_gpx_mut(gpx: &mut gpx::Gpx, solver_config: &Solver
 fn simplify_track(track: &gpx::Track, config: &SolverConfig) -> gpx::Track {
     let point_count = count_points_in_track(track);
 
+    let track_name: &str = track.name.as_ref().map_or("", |name| name.as_str());
+
     if point_count <= config.max_points {
         info!(
-            "Track already has {point_count} <= {} points.",
+            "Track '{track_name}' already has {point_count} <= {} points.",
             config.max_points
         );
         return track.clone();
     }
 
-    info!("Simplifying track ({point_count} points)...");
+    info!("Simplifying track '{track_name}' ({point_count} points)...");
 
     // We perform a binary search to find an optimal epsilon value for simplification.
 
@@ -103,7 +105,7 @@ fn simplify_track(track: &gpx::Track, config: &SolverConfig) -> gpx::Track {
         let simplified_indices = simplify_segment_lines(&segments_as_lines, epsilon, config.method);
         let new_point_count = count_points_in_simplified_segment_indices(&simplified_indices);
 
-        info!("    [{iteration_count}] {new_point_count} points for epsilon={max_epsilon}.");
+        info!("    [{iteration_count}] {new_point_count} points for epsilon={epsilon}.");
 
         if (best_point_count > config.max_points && new_point_count < best_point_count)
             || (new_point_count > best_point_count && new_point_count <= config.max_points)
