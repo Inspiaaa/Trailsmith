@@ -2,6 +2,7 @@ use crate::simplifier::{SimplificationMethod, SolverConfig};
 use clap::{Parser, ValueEnum};
 use std::fs;
 use std::fs::File;
+use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use env_logger::Target;
 use log::info;
@@ -66,19 +67,18 @@ fn main() {
         .filter_level(logging_level)
         .init();
 
-    info!("Processing paths...");
-
     let input_path = args.input;
     let mut output_path = args.output;
 
     if output_path.is_dir() {
-        output_path = output_path.join(input_path.file_name().unwrap());
+        output_path = output_path.join(input_path.file_name().expect("Input path malformed."));
     }
 
     info!("Loading input file...");
 
     let input_file_contents = fs::read(input_path).expect("Could not read input file.");
     let output_file = File::create(output_path.as_path()).expect("Unable to create output file.");
+    let mut output_writer = BufWriter::new(output_file);
 
     info!("Simplifying...");
 
@@ -101,9 +101,11 @@ fn main() {
 
     simplifier::simplify_all_tracks_in_file(
         input_file_contents.as_slice(),
-        output_file,
+        &mut output_writer,
         &solver_config
     );
+
+    output_writer.flush().expect("Error writing to output file");   
 
     info!("Finished simplification. Wrote output to '{}'.", output_path.display())
 }
