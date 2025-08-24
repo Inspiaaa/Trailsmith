@@ -5,13 +5,15 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use env_logger::Target;
 use log::info;
+use crate::gpx_clean::cli::run_cli_with_args;
 use crate::gpx_reduce_points::simplifier;
 use crate::gpx_reduce_points::simplifier::{SimplificationMethod, SolverConfig};
+use crate::util;
 
 const DEFAULT_VW_EPSILON: f64 = 0.0001;
 const DEFAULT_RDP_EPSILON: f64 = 0.001;
 
-#[derive(ValueEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Copy, Eq, PartialEq, Debug)]
 enum AlgorithmOption {
     /// Ramer-Douglas-Peucker
     RDP,
@@ -20,7 +22,7 @@ enum AlgorithmOption {
 }
 
 #[derive(Parser)]
-struct Args {
+pub struct Args {
     /// Input GPX file
     input: PathBuf,
 
@@ -49,22 +51,13 @@ struct Args {
     quiet: bool,
 }
 
-fn main() {
-    let args = Args::parse();
+pub fn run_cli() {
+    let args = crate::gpx_clean::cli::Args::parse();
+    run_cli_with_args(args);
+}
 
-    let logging_level = if args.quiet {
-        log::LevelFilter::Off
-    } else {
-        log::LevelFilter::Trace
-    };
-
-    env_logger::builder()
-        .target(Target::Stdout)
-        .format_timestamp(None)
-        .format_target(false)
-        .format_level(false)
-        .filter_level(logging_level)
-        .init();
+pub fn run_with_cli_args(args: Args) {
+    util::setup_logging(args.quiet);
 
     let input_path = args.input;
     let mut output_path = args.output;

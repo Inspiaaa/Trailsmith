@@ -3,13 +3,13 @@ use geo::{LineString, Point, SimplifyIdx, SimplifyVwIdx};
 use log::info;
 use std::io;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum SimplificationMethod {
     RamerDouglasPeucker,
     VisvalingamWhyatt,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SolverConfig {
     pub max_points: u32,
     pub max_iterations: u32,
