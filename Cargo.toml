@@ -1,0 +1,17 @@
+[package]
+name = "gpx_tools"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+gpx = "0.10.0"
+geo = "0.30.0"
+kml = { version = "0.11.0", default-features = false }
+clap = { version = "4.5.45", features = ["derive"] }
+log = "0.4.27"
+env_logger = "0.11.8"
+thiserror = "2.0.16"
+
+[lib]
+name = "gpx_tools"
+path = "src/lib.rs"

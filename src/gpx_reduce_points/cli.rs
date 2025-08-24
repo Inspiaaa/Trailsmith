@@ -1,4 +1,3 @@
-use crate::simplifier::{SimplificationMethod, SolverConfig};
 use clap::{Parser, ValueEnum};
 use std::fs;
 use std::fs::File;
@@ -6,8 +5,8 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use env_logger::Target;
 use log::info;
-
-mod simplifier;
+use crate::gpx_reduce_points::simplifier;
+use crate::gpx_reduce_points::simplifier::{SimplificationMethod, SolverConfig};
 
 const DEFAULT_VW_EPSILON: f64 = 0.0001;
 const DEFAULT_RDP_EPSILON: f64 = 0.001;

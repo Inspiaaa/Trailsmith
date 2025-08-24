@@ -3,9 +3,8 @@ use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use clap::Parser;
-use crate::convert::LineStyleConfig;
-
-mod convert;
+use crate::gpx_to_kml::convert;
+use crate::gpx_to_kml::convert::LineStyleConfig;
 
 // Src for the GPX-->KML code: https://github.com/vilaureu/gpx_kml_convert/tree/master
 
