@@ -25,6 +25,7 @@ pub fn simplify_all_tracks_in_file(
     info!("Parsing GPX...");
     let mut gpx = gpx::read(input_file).expect("Failed to parse GPX file.");
     simplify_all_tracks_in_gpx_mut(&mut gpx, solver_config);
+    info!("Writing output...");
     gpx::write(&gpx, output_file).expect("Failed to write GPX file.");
 }
 
