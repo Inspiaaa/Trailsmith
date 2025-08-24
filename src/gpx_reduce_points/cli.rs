@@ -3,11 +3,9 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-use env_logger::Target;
 use log::info;
-use crate::gpx_clean::cli::run_cli_with_args;
-use crate::gpx_reduce_points::simplifier;
-use crate::gpx_reduce_points::simplifier::{SimplificationMethod, SolverConfig};
+use super::simplifier;
+use super::simplifier::{SimplificationMethod, SolverConfig};
 use crate::util;
 
 const DEFAULT_VW_EPSILON: f64 = 0.0001;
@@ -52,11 +50,11 @@ pub struct Args {
 }
 
 pub fn run_cli() {
-    let args = crate::gpx_clean::cli::Args::parse();
+    let args = Args::parse();
     run_cli_with_args(args);
 }
 
-pub fn run_with_cli_args(args: Args) {
+pub fn run_cli_with_args(args: Args) {
     util::setup_logging(args.quiet);
 
     let input_path = args.input;
