@@ -13,7 +13,7 @@ pub mod gpx_to_kml {
     pub mod convert;
 }
 
-pub mod gpx_merge {
+pub mod gpx_merge_files {
     pub mod cli;
     pub mod merger;
 }

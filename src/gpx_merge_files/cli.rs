@@ -4,7 +4,7 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use clap::Parser;
 use log::info;
-use crate::gpx_merge::merger;
+use super::merger;
 use crate::util;
 
 #[derive(Parser, Debug)]
