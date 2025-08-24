@@ -1,12 +1,12 @@
+use super::simplifier;
+use super::simplifier::{SimplificationMethod, SolverConfig};
+use crate::util;
 use clap::{Parser, ValueEnum};
+use log::info;
 use std::fs;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-use log::info;
-use super::simplifier;
-use super::simplifier::{SimplificationMethod, SolverConfig};
-use crate::util;
 
 const DEFAULT_VW_EPSILON: f64 = 0.0001;
 const DEFAULT_RDP_EPSILON: f64 = 0.001;
@@ -86,16 +86,19 @@ pub fn run_cli_with_args(args: Args) {
         max_points: args.max_points,
         max_iterations: args.max_iterations,
         method,
-        initial_epsilon
+        initial_epsilon,
     };
 
     simplifier::simplify_all_tracks_in_file(
         input_file_contents.as_slice(),
         &mut output_writer,
-        &solver_config
+        &solver_config,
     );
 
-    output_writer.flush().expect("Error writing to output file");   
+    output_writer.flush().expect("Error writing to output file");
 
-    info!("Finished simplification. Wrote output to '{}'.", output_path.display())
+    info!(
+        "Finished simplification. Wrote output to '{}'.",
+        output_path.display()
+    )
 }

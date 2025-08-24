@@ -1,12 +1,12 @@
+use super::convert;
+use super::convert::LineStyleConfig;
+use crate::util;
+use clap::Parser;
+use log::info;
 use std::fs;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-use clap::Parser;
-use log::info;
-use crate::util;
-use super::convert;
-use super::convert::LineStyleConfig;
 
 // Src for the GPX-->KML code: https://github.com/vilaureu/gpx_kml_convert/tree/master
 
@@ -29,7 +29,7 @@ pub struct Args {
 
     /// Line width
     #[arg(short = 'w', long = "width", default_value = "1.0")]
-    line_width: f64
+    line_width: f64,
 }
 
 pub fn run_cli() {
@@ -41,12 +41,14 @@ pub fn run_cli_with_args(args: Args) {
     util::setup_logging(args.quiet);
 
     let input_path = args.input;
-    let mut output_path = args.output.unwrap_or_else(|| {
-        input_path.with_extension("kml")
-    });
+    let mut output_path = args
+        .output
+        .unwrap_or_else(|| input_path.with_extension("kml"));
 
     if output_path.is_dir() {
-        output_path = output_path.join(input_path.file_name().expect("Input path malformed")).with_extension("kml");
+        output_path = output_path
+            .join(input_path.file_name().expect("Input path malformed"))
+            .with_extension("kml");
     }
 
     info!("Loading input file...");
@@ -56,15 +58,25 @@ pub fn run_cli_with_args(args: Args) {
     let mut output_writer = BufWriter::new(output_file);
 
     info!("Converting...");
-    
+
     let line_style = LineStyleConfig {
         color: args.line_color,
         width: args.line_width,
     };
 
-    convert::convert(input_file_contents.as_slice(), &mut output_writer, &line_style).unwrap();
-    
-    output_writer.flush().expect("Error writing to output file.");
+    convert::convert(
+        input_file_contents.as_slice(),
+        &mut output_writer,
+        &line_style,
+    )
+    .unwrap();
 
-    info!("Finished conversion. Wrote output to '{}'.", output_path.display())
+    output_writer
+        .flush()
+        .expect("Error writing to output file.");
+
+    info!(
+        "Finished conversion. Wrote output to '{}'.",
+        output_path.display()
+    )
 }

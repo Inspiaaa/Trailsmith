@@ -1,6 +1,6 @@
 pub mod gpx_clean {
-    pub mod cli;
     pub mod cleaner;
+    pub mod cli;
 }
 
 pub mod gpx_reduce_points {

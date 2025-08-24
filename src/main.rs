@@ -11,7 +11,7 @@ enum Command {
 #[derive(Parser)]
 struct Cli {
     #[clap(subcommand)]
-    command: Command
+    command: Command,
 }
 
 fn main() {

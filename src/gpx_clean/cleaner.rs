@@ -1,11 +1,11 @@
-use std::io::Write;
 use clap::ValueEnum;
 use gpx::{Gpx, GpxVersion, Waypoint};
+use std::io::Write;
 
 #[derive(ValueEnum, Copy, Clone, Debug, Eq, PartialEq)]
 pub enum EncodingOption {
     Utf8,
-    Ascii
+    Ascii,
 }
 
 #[derive(ValueEnum, Copy, Clone, Debug, Eq, PartialEq)]
@@ -13,7 +13,7 @@ pub enum ErrorStrategy {
     /// Ignores non-ASCII characters.
     Ignore,
     /// Converts non-ASCII characters to '?'
-    Replace
+    Replace,
 }
 
 #[derive(ValueEnum, Copy, Clone, Debug, Eq, PartialEq)]
@@ -23,9 +23,8 @@ pub enum VersionOption {
     V11,
     /// Version 1.0
     #[value(name = "1.0")]
-    V10
+    V10,
 }
-
 
 pub fn set_creator(gpx: &mut Gpx, creator: String) {
     gpx.creator = Some(creator);
@@ -66,7 +65,7 @@ pub fn rename_tracks_interactively(gpx: &mut Gpx) {
         match &track.name {
             Some(name) => {
                 println!("  Current name: '{name}'");
-            },
+            }
             None => {
                 println!("  No name available.");
             }
@@ -77,7 +76,9 @@ pub fn rename_tracks_interactively(gpx: &mut Gpx) {
         std::io::stdout().flush().expect("Could not flush stdout.");
 
         let mut new_name: String = String::new();
-        std::io::stdin().read_line(&mut new_name).expect("Could not read from stdin.");
+        std::io::stdin()
+            .read_line(&mut new_name)
+            .expect("Could not read from stdin.");
         let new_name = new_name.trim();
 
         if !new_name.is_empty() {
@@ -149,7 +150,7 @@ pub fn remove_non_ascii_chars(text: &mut Vec<u8>, strategy: ErrorStrategy) {
     match strategy {
         ErrorStrategy::Ignore => {
             text.retain(|c| c.is_ascii());
-        },
+        }
         ErrorStrategy::Replace => {
             for char in text.iter_mut() {
                 if !char.is_ascii() {

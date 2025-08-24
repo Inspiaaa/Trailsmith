@@ -27,9 +27,12 @@ use std::collections::HashMap;
 use std::fmt::Write;
 use std::io::{self, Read};
 
-use gpx::{errors::GpxError, Link, Metadata, Route, Track, TrackSegment, Waypoint};
-use kml::types::{AltitudeMode, Coord, Geometry, LineString, MultiGeometry, Placemark, Point, LineStyle, ColorMode, Style};
-use kml::{types::Element, Kml, KmlDocument, KmlVersion, KmlWriter};
+use gpx::{Link, Metadata, Route, Track, TrackSegment, Waypoint, errors::GpxError};
+use kml::types::{
+    AltitudeMode, ColorMode, Coord, Geometry, LineString, LineStyle, MultiGeometry, Placemark,
+    Point, Style,
+};
+use kml::{Kml, KmlDocument, KmlVersion, KmlWriter, types::Element};
 use thiserror::Error;
 
 /// This line needs to be prepended to the KML output.
@@ -73,7 +76,11 @@ const LINE_STYLE_NAME: &str = "defaultLineStyle";
 ///
 /// If an error occurs, the function returns immediately. The `source` and
 /// `sink` might have been modified in this case.
-pub fn convert(source: impl Read, mut sink: impl io::Write, line_style: &LineStyleConfig) -> Result<(), Error> {
+pub fn convert(
+    source: impl Read,
+    mut sink: impl io::Write,
+    line_style: &LineStyleConfig,
+) -> Result<(), Error> {
     let gpx = gpx::read(source)?;
 
     let mut elements = vec![simple_kelem("open", DEFAULT_OPEN)];

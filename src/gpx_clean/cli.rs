@@ -1,9 +1,9 @@
-use std::fs;
-use std::path::PathBuf;
+use super::cleaner::*;
+use crate::util;
 use clap::Parser;
 use log::info;
-use crate::util;
-use super::cleaner::*;
+use std::fs;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 pub struct Args {
@@ -122,5 +122,8 @@ pub fn run_cli_with_args(args: Args) {
     info!("Writing output...");
     fs::write(output_path.as_path(), output).expect("Could not write output file.");
 
-    info!("Finished clean. Wrote output to '{}'.", output_path.display())
+    info!(
+        "Finished clean. Wrote output to '{}'.",
+        output_path.display()
+    )
 }
