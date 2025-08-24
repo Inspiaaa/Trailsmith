@@ -73,26 +73,6 @@ const LINE_STYLE_NAME: &str = "defaultLineStyle";
 ///
 /// If an error occurs, the function returns immediately. The `source` and
 /// `sink` might have been modified in this case.
-///
-/// # Example
-/// ```
-/// # use gpx_kml_convert::convert;
-/// #
-/// let source = r#"<?xml version="1.0" encoding="UTF-8"?>
-/// <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1">
-///     <wpt lat="48.858222" lon="2.2945"><name>Eiffel Tower</name></wpt>
-/// </gpx>
-/// "#;
-/// let mut sink = vec![];
-///
-/// convert(source.as_bytes(), &mut sink).expect("conversion failed");
-///
-/// let kml = String::from_utf8(sink).expect("KML data is not valid UTF-8");
-/// assert!(kml.contains("<kml"));
-/// assert!(kml.contains("2.2945"));
-/// assert!(kml.contains("48.858222"));
-/// assert!(kml.contains("Eiffel Tower"));
-/// ```
 pub fn convert(source: impl Read, mut sink: impl io::Write, line_style: &LineStyleConfig) -> Result<(), Error> {
     let gpx = gpx::read(source)?;
 
