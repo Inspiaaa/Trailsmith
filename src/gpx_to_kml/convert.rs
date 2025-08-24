@@ -79,7 +79,7 @@ pub fn convert(source: impl Read, mut sink: impl io::Write, line_style: &LineSty
     let mut elements = vec![simple_kelem("open", DEFAULT_OPEN)];
     push_metadata(gpx.metadata.unwrap_or_default(), gpx.creator, &mut elements);
 
-    elements.push(create_red_line_style(line_style));
+    elements.push(create_default_line_style(line_style));
 
     for waypoint in gpx.waypoints {
         elements.push(convert_waypoint(waypoint));
@@ -115,7 +115,7 @@ pub fn convert(source: impl Read, mut sink: impl io::Write, line_style: &LineSty
     Ok(())
 }
 
-fn create_red_line_style(line_style: &LineStyleConfig) -> Kml {
+fn create_default_line_style(line_style: &LineStyleConfig) -> Kml {
     let line_style = LineStyle {
         color: line_style.color.clone(),
         color_mode: ColorMode::Normal,

@@ -3,13 +3,14 @@ use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use clap::Parser;
-use crate::gpx_to_kml::convert;
-use crate::gpx_to_kml::convert::LineStyleConfig;
+use log::info;
+use super::convert;
+use super::convert::LineStyleConfig;
 
 // Src for the GPX-->KML code: https://github.com/vilaureu/gpx_kml_convert/tree/master
 
 #[derive(Parser)]
-struct Cli {
+pub struct Args {
     /// Input GPX file
     input: PathBuf,
 
@@ -30,9 +31,12 @@ struct Cli {
     line_width: f64
 }
 
-fn main() {
-    let args = Cli::parse();
+pub fn run_cli() {
+    let args = Args::parse();
+    run_cli_with_args(args);
+}
 
+pub fn run_cli_with_args(args: Args) {
     let input_path = args.input;
     let mut output_path = args.output.unwrap_or_else(|| {
         input_path.with_extension("kml")
@@ -42,13 +46,13 @@ fn main() {
         output_path = output_path.join(input_path.file_name().expect("Input path malformed")).with_extension("kml");
     }
 
-    if !args.quiet { println!("Loading input file..."); }
+    info!("Loading input file...");
 
     let input_file_contents = fs::read(input_path).expect("Could not read input file.");
     let output_file = File::create(output_path.as_path()).expect("Unable to create output file.");
     let mut output_writer = BufWriter::new(output_file);
 
-    if !args.quiet { println!("Converting..."); }
+    info!("Converting...");
     
     let line_style = LineStyleConfig {
         color: args.line_color,
@@ -59,7 +63,5 @@ fn main() {
     
     output_writer.flush().expect("Error writing to output file.");
 
-    if !args.quiet {
-        println!("Finished conversion. Wrote output to '{}'.", output_path.display())
-    }
+    info!("Finished conversion. Wrote output to '{}'.", output_path.display())
 }
