@@ -13,4 +13,9 @@ pub mod gpx_to_kml {
     pub mod convert;
 }
 
+pub mod gpx_merge {
+    pub mod cli;
+    pub mod merger;
+}
+
 pub(crate) mod util;
