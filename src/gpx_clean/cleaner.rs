@@ -2,13 +2,13 @@ use std::io::Write;
 use clap::ValueEnum;
 use gpx::{Gpx, GpxVersion, Waypoint};
 
-#[derive(ValueEnum, Clone, Debug, Eq, PartialEq)]
+#[derive(ValueEnum, Copy, Clone, Debug, Eq, PartialEq)]
 pub enum EncodingOption {
     Utf8,
     Ascii
 }
 
-#[derive(ValueEnum, Clone, Debug, Eq, PartialEq)]
+#[derive(ValueEnum, Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ErrorStrategy {
     /// Ignores non-ASCII characters.
     Ignore,
@@ -16,7 +16,7 @@ pub enum ErrorStrategy {
     Replace
 }
 
-#[derive(ValueEnum, Clone, Debug, Eq, PartialEq)]
+#[derive(ValueEnum, Copy, Clone, Debug, Eq, PartialEq)]
 pub enum VersionOption {
     /// Version 1.1
     #[value(name = "1.1")]

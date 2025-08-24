@@ -20,7 +20,7 @@ enum AlgorithmOption {
 }
 
 #[derive(Parser)]
-struct Cli {
+struct Args {
     /// Input GPX file
     input: PathBuf,
 
@@ -50,7 +50,7 @@ struct Cli {
 }
 
 fn main() {
-    let args = Cli::parse();
+    let args = Args::parse();
 
     let logging_level = if args.quiet {
         log::LevelFilter::Off
