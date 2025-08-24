@@ -4,6 +4,7 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use clap::Parser;
 use log::info;
+use crate::util;
 use super::convert;
 use super::convert::LineStyleConfig;
 
@@ -37,6 +38,8 @@ pub fn run_cli() {
 }
 
 pub fn run_cli_with_args(args: Args) {
+    util::setup_logging(args.quiet);
+
     let input_path = args.input;
     let mut output_path = args.output.unwrap_or_else(|| {
         input_path.with_extension("kml")
