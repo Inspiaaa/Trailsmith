@@ -1,5 +1,5 @@
 use gpx_tools::gpx_clean;
 
-fn main() {
-    gpx_clean::cli::run_cli();
+fn main() -> Result<(), anyhow::Error> {
+    gpx_clean::cli::run_cli()
 }

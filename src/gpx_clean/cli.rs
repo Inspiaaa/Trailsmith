@@ -1,9 +1,10 @@
 use super::cleaner::*;
-use crate::util;
+use crate::{error_messages, util};
 use clap::Parser;
 use log::info;
 use std::fs;
 use std::path::PathBuf;
+use anyhow::Context;
 
 #[derive(Parser)]
 pub struct Args {
@@ -79,26 +80,30 @@ pub struct Args {
     remove_route_elevation: bool,
 }
 
-pub fn run_cli() {
+pub fn run_cli() -> anyhow::Result<()> {
     let args = Args::parse();
-    run_cli_with_args(args);
+    run_cli_with_args(args)
 }
 
-pub fn run_cli_with_args(args: Args) {
+pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
     util::setup_logging(args.quiet);
 
     let input_path = args.input;
     let mut output_path = args.output;
 
     if output_path.is_dir() {
-        output_path = output_path.join(input_path.file_name().expect("Input path malformed."));
+        let file_name = input_path.file_name()
+            .with_context(|| error_messages::INPUT_PATH_MISSING_FILE_NAME)?;
+        output_path = output_path.join(file_name);
     }
 
     info!("Loading input file...");
-    let input_file_contents = fs::read(input_path).expect("Could not read input file.");
+    let input_file_contents = fs::read(input_path)
+        .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
 
     info!("Parsing GPX file...");
-    let mut gpx = gpx::read(input_file_contents.as_slice()).expect("Could not parse GPX file.");
+    let mut gpx = gpx::read(input_file_contents.as_slice())
+        .with_context(|| error_messages::GPX_PARSE_ERROR)?;
 
     info!("Processing...");
     set_version(&mut gpx, args.set_version);
@@ -122,18 +127,17 @@ pub fn run_cli_with_args(args: Args) {
 
     info!("Serializing GPX file...");
     let mut output = Vec::new();
-    gpx::write(&gpx, &mut output).expect("Could not write GPX file.");
+    gpx::write(&gpx, &mut output)
+        .with_context(|| error_messages::GPX_SERIALIZE_ERROR)?;
 
     if args.encoding == EncodingOption::Ascii {
         info!("Converting to ASCII...");
         remove_non_ascii_chars(&mut output, args.strategy);
     }
 
-    info!("Writing output...");
-    fs::write(output_path.as_path(), output).expect("Could not write output file.");
+    info!("Writing output to '{}'...", output_path.display());
+    fs::write(output_path.as_path(), output)
+        .with_context(|| error_messages::OUTPUT_FILE_WRITE_ERROR)?;
 
-    info!(
-        "Finished clean. Wrote output to '{}'.",
-        output_path.display()
-    )
+    Ok(())
 }
