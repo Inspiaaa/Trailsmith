@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 pub struct Args {
-    /// Input GPX file.
+    /// Input GPX file path.
     input: PathBuf,
 
     /// Output GPX file path.
@@ -24,13 +24,13 @@ pub struct Args {
 
     /// Strategy for dealing with non-ASCII characters.
     #[arg(short = 's', long = "strategy", default_value = "ignore")]
-    strategy: ErrorStrategy,
+    strategy: AsciiErrorStrategy,
 
-    /// Sets the "creator" field (software / person who made the GPX file).
+    /// Set the "creator" field (software / person who made the GPX file).
     #[arg(long = "set-creator")]
     set_creator: Option<String>,
 
-    /// Sets the GPX file format version.
+    /// Set the GPX file format version.
     #[arg(long = "set-version", default_value = "1.1")]
     set_version: VersionOption,
 
@@ -38,23 +38,23 @@ pub struct Args {
     #[arg(long = "rename-tracks")]
     rename_tracks: bool,
 
-    /// Removes all waypoints.
+    /// Remove all waypoints.
     #[arg(long = "remove-waypoints")]
     remove_waypoints: bool,
 
-    /// Removes all tracks.
+    /// Remove all tracks.
     #[arg(long = "remove-tracks")]
     remove_tracks: bool,
 
-    /// Removes all routes.
+    /// Remove all routes.
     #[arg(long = "remove-routes")]
     remove_routes: bool,
 
-    /// Removes all "general" GPX metadata.
+    /// Remove all "general" GPX metadata.
     #[arg(long = "remove-metadata")]
     remove_metadata: bool,
 
-    /// Removes all general metadata (except for the name) from each track.
+    /// Remove all general metadata (except for the name) from each track.
     #[arg(long = "remove-track-metadata")]
     remove_track_metadata: bool,
 

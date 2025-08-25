@@ -9,7 +9,7 @@ pub enum EncodingOption {
 }
 
 #[derive(ValueEnum, Copy, Clone, Debug, Eq, PartialEq)]
-pub enum ErrorStrategy {
+pub enum AsciiErrorStrategy {
     /// Ignores non-ASCII characters.
     Ignore,
     /// Converts non-ASCII characters to '?'
@@ -146,12 +146,12 @@ pub fn remove_waypoint_metadata(point: &mut Waypoint) {
     point.dgpsid = None;
 }
 
-pub fn remove_non_ascii_chars(text: &mut Vec<u8>, strategy: ErrorStrategy) {
+pub fn remove_non_ascii_chars(text: &mut Vec<u8>, strategy: AsciiErrorStrategy) {
     match strategy {
-        ErrorStrategy::Ignore => {
+        AsciiErrorStrategy::Ignore => {
             text.retain(|c| c.is_ascii());
         }
-        ErrorStrategy::Replace => {
+        AsciiErrorStrategy::Replace => {
             for char in text.iter_mut() {
                 if !char.is_ascii() {
                     *char = b'?';
