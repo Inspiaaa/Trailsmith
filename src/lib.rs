@@ -23,6 +23,11 @@ pub mod gpx_reverse_tracks {
     pub mod reverser;
 }
 
+pub mod gpx_routes_to_tracks {
+    pub mod cli;
+    pub mod converter;
+}
+
 pub mod util;
 
 pub mod error_messages;
