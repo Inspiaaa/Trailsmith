@@ -18,4 +18,9 @@ pub mod gpx_merge_files {
     pub mod merger;
 }
 
+pub mod gpx_reverse_tracks {
+    pub mod cli;
+    pub mod reverser;
+}
+
 pub(crate) mod util;
