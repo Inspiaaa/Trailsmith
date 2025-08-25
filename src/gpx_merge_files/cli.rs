@@ -6,7 +6,7 @@ use anyhow::Context;
 use clap::Parser;
 use log::info;
 use super::merger;
-use crate::{error_messages, util};
+use crate::{error_messages, single_gpx_file_cli, util};
 
 #[derive(Parser, Debug)]
 pub struct Args {
@@ -45,43 +45,27 @@ pub fn run_cli() -> Result<(), anyhow::Error> {
 pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
     util::setup_logging(args.quiet);
 
-    let master_path = args.master;
-    let output_path = util::process_output_path(args.output, &master_path)?;
+    single_gpx_file_cli::read_and_write_gpx_file(args.master, args.output, |master_gpx| {
+        info!("Merging files...");
 
-    info!("Loading input file...");
-    let input_file_contents = fs::read(master_path)
-        .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
+        for other_path in args.files {
+            info!("  {}", other_path.display());
+            let other_file_contents = fs::read(other_path)
+                .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
+            let other_gpx = gpx::read(other_file_contents.as_slice())
+                .with_context(|| error_messages::GPX_PARSE_ERROR)?;
 
-    info!("Merging files...");
-    let mut master = gpx::read(input_file_contents.as_slice())
-        .with_context(|| error_messages::GPX_PARSE_ERROR)?;
-
-    for other_path in args.files {
-        info!("  {}", other_path.display());
-        let other_file_contents = fs::read(other_path)
-            .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
-        let other_gpx = gpx::read(other_file_contents.as_slice())
-            .with_context(|| error_messages::GPX_PARSE_ERROR)?;
-
-        if !args.no_tracks {
-            merger::merge_tracks(&mut master, &other_gpx);
+            if !args.no_tracks {
+                merger::merge_tracks(master_gpx, &other_gpx);
+            }
+            if !args.no_routes {
+                merger::merge_routes(master_gpx, &other_gpx);
+            }
+            if !args.no_waypoints {
+                merger::merge_waypoints(master_gpx, &other_gpx);
+            }
         }
-        if !args.no_routes {
-            merger::merge_routes(&mut master, &other_gpx);
-        }
-        if !args.no_waypoints {
-            merger::merge_waypoints(&mut master, &other_gpx);
-        }
-    }
 
-    info!("Writing output to {}...", output_path.display());
-    let output_file = File::create(output_path.as_path())
-        .with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
-    let mut output_writer = BufWriter::new(output_file);
-
-    gpx::write(&master, &mut output_writer).with_context(|| error_messages::GPX_SERIALIZE_ERROR)?;
-
-    output_writer.flush().with_context(|| error_messages::OUTPUT_FILE_WRITE_ERROR)?;
-
-    Ok(())
+        Ok(())
+    })
 }
