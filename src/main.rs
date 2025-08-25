@@ -1,25 +1,28 @@
 use std::error::Error;
 use clap::{Parser, Subcommand};
-use gpx_tools::{gpx_clean, gpx_merge_files, gpx_reduce_points, gpx_reverse_tracks, gpx_routes_to_tracks, gpx_to_kml};
+use gpx_tools::{gpx_clean, gpx_merge_files, gpx_merge_tracks, gpx_reduce_points, gpx_reverse_tracks, gpx_routes_to_tracks, gpx_to_kml};
 
 #[derive(Subcommand)]
 enum Command {
-    /// Fix encoding errors, remove metadata and features, change track names
+    /// Fix encoding errors, remove metadata and features, change track names.
     Clean(gpx_clean::cli::Args),
 
-    /// Reduce the number of points in tracks
+    /// Reduce the number of points in tracks.
     ReducePoints(gpx_reduce_points::cli::Args),
 
-    /// Convert a GPX file to KML format
+    /// Convert a GPX file to KML format.
     GpxToKml(gpx_to_kml::cli::Args),
 
-    /// Merge multiple GPX files into a single file
+    /// Merge multiple GPX files into a single file.
     MergeFiles(gpx_merge_files::cli::Args),
 
-    /// Reverse the order of track points in all tracks
+    /// Merge all tracks within a GPX file.
+    MergeTracks(gpx_merge_tracks::cli::Args),
+
+    /// Reverse the order of track points in all tracks.
     ReverseTracks(gpx_reverse_tracks::cli::Args),
 
-    /// Convert GPX routes into tracks
+    /// Convert GPX routes into tracks.
     RoutesToTracks(gpx_routes_to_tracks::cli::Args),
 }
 
@@ -39,6 +42,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::MergeFiles(args) => gpx_merge_files::cli::run_cli_with_args(args)?,
         Command::ReverseTracks(args) => gpx_reverse_tracks::cli::run_cli_with_args(args)?,
         Command::RoutesToTracks(args) => gpx_routes_to_tracks::cli::run_cli_with_args(args)?,
+        Command::MergeTracks(args) => gpx_merge_tracks::cli::run_cli_with_args(args)?,
     }
 
     Ok(())
