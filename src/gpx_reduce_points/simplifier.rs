@@ -1,7 +1,6 @@
 use geo;
 use geo::{LineString, Point, SimplifyIdx, SimplifyVwIdx};
 use log::info;
-use std::io;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum SimplificationMethod {

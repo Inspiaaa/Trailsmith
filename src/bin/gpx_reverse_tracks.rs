@@ -1,4 +1,3 @@
-use std::error::Error;
 use gpx_tools::gpx_reverse_tracks;
 
 fn main() -> anyhow::Result<()> {

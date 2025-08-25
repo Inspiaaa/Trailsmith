@@ -89,7 +89,6 @@ pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
     util::setup_logging(args.quiet);
 
     let input_path = args.input;
-
     let output_path = util::process_output_path(args.output, &input_path)?;
 
     info!("Loading input file...");

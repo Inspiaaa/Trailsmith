@@ -49,7 +49,6 @@ pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
     let output_path = util::process_output_path(args.output, &master_path)?;
 
     info!("Loading input file...");
-
     let input_file_contents = fs::read(master_path)
         .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
 

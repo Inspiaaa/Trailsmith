@@ -1,13 +1,9 @@
 use super::simplifier;
 use super::simplifier::{SimplificationMethod, SolverConfig};
-use crate::{error_messages, single_gpx_file_cli, util};
+use crate::{single_gpx_file_cli, util};
 use clap::{Parser, ValueEnum};
 use log::info;
-use std::fs;
-use std::fs::File;
-use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-use anyhow::Context;
 
 const DEFAULT_VW_EPSILON: f64 = 0.0001;
 const DEFAULT_RDP_EPSILON: f64 = 0.001;
