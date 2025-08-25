@@ -46,13 +46,7 @@ pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
     util::setup_logging(args.quiet);
 
     let master_path = args.master;
-    let mut output_path = args.output;
-
-    if output_path.is_dir() {
-        let file_name = master_path.file_name()
-            .with_context(|| error_messages::INPUT_PATH_MISSING_FILE_NAME)?;
-        output_path = output_path.join(file_name);
-    }
+    let output_path = util::process_output_path(args.output, &master_path)?;
 
     info!("Loading input file...");
 
