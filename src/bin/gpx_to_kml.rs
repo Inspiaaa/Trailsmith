@@ -1,5 +1,5 @@
 use gpx_tools::gpx_to_kml;
 
-fn main() {
-    gpx_to_kml::cli::run_cli();
+fn main() -> anyhow::Result<()> {
+    gpx_to_kml::cli::run_cli()
 }

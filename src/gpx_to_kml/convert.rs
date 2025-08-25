@@ -27,7 +27,7 @@ use std::collections::HashMap;
 use std::fmt::Write;
 use std::io::{self, Read};
 
-use gpx::{Link, Metadata, Route, Track, TrackSegment, Waypoint, errors::GpxError};
+use gpx::{Link, Metadata, Route, Track, TrackSegment, Waypoint, errors::GpxError, Gpx};
 use kml::types::{
     AltitudeMode, ColorMode, Coord, Geometry, LineString, LineStyle, MultiGeometry, Placemark,
     Point, Style,
@@ -69,20 +69,7 @@ pub struct LineStyleConfig {
 
 const LINE_STYLE_NAME: &str = "defaultLineStyle";
 
-/// Read a GPX file and write a KML file.
-///
-/// A complete GPX file is read from `source`. The converted data is written as
-/// a complete KML file to `sink`.
-///
-/// If an error occurs, the function returns immediately. The `source` and
-/// `sink` might have been modified in this case.
-pub fn convert(
-    source: impl Read,
-    mut sink: impl io::Write,
-    line_style: &LineStyleConfig,
-) -> Result<(), Error> {
-    let gpx = gpx::read(source)?;
-
+pub fn convert(gpx: Gpx, line_style: &LineStyleConfig) -> Kml {
     let mut elements = vec![simple_kelem("open", DEFAULT_OPEN)];
     push_metadata(gpx.metadata.unwrap_or_default(), gpx.creator, &mut elements);
 
@@ -114,10 +101,13 @@ pub fn convert(
         elements: vec![document],
     });
 
-    writeln!(&mut sink, "{XML_HEAD}").unwrap();
-    let mut writer = KmlWriter::from_writer(&mut sink);
-    writer.write(&kml)?;
-    writeln!(&mut sink).unwrap();
+    kml
+}
+
+pub fn serialize_kml(kml: &Kml, mut writer: impl io::Write) -> Result<(), Error> {
+    writeln!(&mut writer, "{XML_HEAD}").unwrap();
+    KmlWriter::from_writer(&mut writer).write(&kml)?;
+    writeln!(&mut writer).unwrap();
 
     Ok(())
 }

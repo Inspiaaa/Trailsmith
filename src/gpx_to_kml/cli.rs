@@ -1,13 +1,15 @@
 use super::convert;
 use super::convert::LineStyleConfig;
-use crate::util;
+use crate::{error_messages, single_gpx_file_cli, util};
 use clap::Parser;
 use log::info;
 use std::fs;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-
+use anyhow::Context;
+use kml::KmlWriter;
+use crate::util::process_output_path;
 // Src for the GPX-->KML code: https://github.com/vilaureu/gpx_kml_convert/tree/master
 
 #[derive(Parser)]
@@ -32,51 +34,41 @@ pub struct Args {
     line_width: f64,
 }
 
-pub fn run_cli() {
+pub fn run_cli() -> anyhow::Result<()> {
     let args = Args::parse();
-    run_cli_with_args(args);
+    run_cli_with_args(args)
 }
 
-pub fn run_cli_with_args(args: Args) {
+pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
     util::setup_logging(args.quiet);
 
     let input_path = args.input;
-    let mut output_path = args
-        .output
-        .unwrap_or_else(|| input_path.with_extension("kml"));
 
-    if output_path.is_dir() {
-        output_path = output_path
-            .join(input_path.file_name().expect("Input path malformed"))
-            .with_extension("kml");
-    }
+    let output_path = match args.output {
+        None => input_path.with_extension("kml"),
+        Some(path) => process_output_path(path, &input_path)?.with_extension("kml"),
+    };
 
-    info!("Loading input file...");
+    let gpx = single_gpx_file_cli::read_gpx_file(&input_path)?;
 
-    let input_file_contents = fs::read(input_path).expect("Could not read input file.");
-    let output_file = File::create(output_path.as_path()).expect("Unable to create output file.");
-    let mut output_writer = BufWriter::new(output_file);
-
-    info!("Converting...");
-
+    info!("Converting to KML...");
     let line_style = LineStyleConfig {
         color: args.line_color,
         width: args.line_width,
     };
+    let kml = convert::convert(gpx, &line_style);
 
-    convert::convert(
-        input_file_contents.as_slice(),
-        &mut output_writer,
-        &line_style,
-    )
-    .unwrap();
+    info!("Writing output to {}...", output_path.display());
+    let output_file = File::create(output_path.as_path())
+        .with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
+    let mut output_writer = BufWriter::new(output_file);
+
+    convert::serialize_kml(&kml, &mut output_writer)
+        .with_context(|| error_messages::KML_SERIALIZE_ERROR)?;
 
     output_writer
         .flush()
-        .expect("Error writing to output file.");
+        .with_context(|| error_messages::OUTPUT_FILE_WRITE_ERROR)?;
 
-    info!(
-        "Finished conversion. Wrote output to '{}'.",
-        output_path.display()
-    )
+    Ok(())
 }
