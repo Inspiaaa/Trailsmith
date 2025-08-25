@@ -146,6 +146,24 @@ pub fn remove_waypoint_metadata(point: &mut Waypoint) {
     point.dgpsid = None;
 }
 
+pub fn remove_track_elevation(gpx: &mut Gpx) {
+    for track in gpx.tracks.iter_mut() {
+        for segment in track.segments.iter_mut() {
+            for point in segment.points.iter_mut() {
+                point.elevation = None;
+            }
+        }
+    }
+}
+
+pub fn remove_route_elevation(gpx: &mut Gpx) {
+    for route in gpx.routes.iter_mut() {
+        for point in route.points.iter_mut() {
+            point.elevation = None;
+        }
+    }
+}
+
 pub fn remove_non_ascii_chars(text: &mut Vec<u8>, strategy: AsciiErrorStrategy) {
     match strategy {
         AsciiErrorStrategy::Ignore => {

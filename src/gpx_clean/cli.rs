@@ -69,6 +69,14 @@ pub struct Args {
     /// Remove the metadata from each point of each route, only keeping lon, lat, and elevation.
     #[arg(long = "remove-route-point-metadata")]
     remove_route_point_metadata: bool,
+
+    /// Remove the elevation data from each track point.
+    #[arg(long = "remove-track-elevation")]
+    remove_track_elevation: bool,
+
+    /// Remove the elevation data from each route point.
+    #[arg(long = "remove-route-elevation")]
+    remove_route_elevation: bool,
 }
 
 pub fn run_cli() {
@@ -107,6 +115,8 @@ pub fn run_cli_with_args(args: Args) {
     if args.remove_route_metadata { remove_route_metadata(&mut gpx); }
     if args.remove_track_point_metadata { remove_track_point_metadata(&mut gpx); }
     if args.remove_route_point_metadata { remove_route_point_metadata(&mut gpx); }
+    if args.remove_track_elevation { remove_track_elevation(&mut gpx); }
+    if args.remove_route_elevation { remove_route_elevation(&mut gpx); }
 
     if args.rename_tracks { rename_tracks_interactively(&mut gpx); }
 
