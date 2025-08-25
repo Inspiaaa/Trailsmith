@@ -1,5 +1,5 @@
-use super::convert;
-use super::convert::LineStyleConfig;
+use super::converter;
+use super::converter::LineStyleConfig;
 use crate::{error_messages, single_gpx_file_cli, util};
 use clap::Parser;
 use log::info;
@@ -55,14 +55,14 @@ pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
         color: args.line_color,
         width: args.line_width,
     };
-    let kml = convert::convert(gpx, &line_style);
+    let kml = converter::convert(gpx, &line_style);
 
     info!("Writing output to {}...", output_path.display());
     let output_file = File::create(output_path.as_path())
         .with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
     let mut output_writer = BufWriter::new(output_file);
 
-    convert::serialize_kml(&kml, &mut output_writer)
+    converter::serialize_kml(&kml, &mut output_writer)
         .with_context(|| error_messages::KML_SERIALIZE_ERROR)?;
 
     output_writer
