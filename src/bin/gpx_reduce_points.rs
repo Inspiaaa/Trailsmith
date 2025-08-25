@@ -1,5 +1,5 @@
 use gpx_tools::gpx_reduce_points;
 
-fn main() -> Result<(), anyhow::Error> {
+fn main() -> anyhow::Result<()> {
     gpx_reduce_points::cli::run_cli()
 }
