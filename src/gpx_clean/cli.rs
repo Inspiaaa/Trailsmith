@@ -1,5 +1,5 @@
 use super::cleaner::*;
-use crate::{error_messages, util};
+use crate::{error_messages, single_gpx_file_cli, util};
 use clap::Parser;
 use log::info;
 use std::fs;
@@ -91,13 +91,7 @@ pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
     let input_path = args.input;
     let output_path = util::process_output_path(args.output, &input_path)?;
 
-    info!("Loading input file...");
-    let input_file_contents = fs::read(input_path)
-        .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
-
-    info!("Parsing GPX file...");
-    let mut gpx = gpx::read(input_file_contents.as_slice())
-        .with_context(|| error_messages::GPX_PARSE_ERROR)?;
+    let mut gpx = single_gpx_file_cli::read_gpx_file(&input_path)?;
 
     info!("Processing...");
     set_version(&mut gpx, args.set_version);
