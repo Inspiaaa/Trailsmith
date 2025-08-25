@@ -6,7 +6,7 @@ use clap::Parser;
 use log::info;
 use super::reverser;
 use super::reverser::RenameStrategy;
-use crate::util;
+use crate::{single_gpx_file_cli, util};
 
 #[derive(Parser)]
 pub struct Args {
@@ -30,34 +30,17 @@ pub struct Args {
     keep_original: bool,
 }
 
-pub fn run_cli() {
+pub fn run_cli() -> anyhow::Result<()> {
     let args = Args::parse();
-    run_cli_with_args(args);
+    run_cli_with_args(args)
 }
 
-pub fn run_cli_with_args(args: Args) {
+pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
     util::setup_logging(args.quiet);
 
-    let input_path = args.input;
-    let mut output_path = args.output;
-
-    if output_path.is_dir() {
-        output_path = output_path.join(input_path.file_name().expect("Input path malformed."));
-    }
-
-    info!("Loading input file...");
-
-    let input_file_contents = fs::read(input_path).expect("Could not read input file.");
-    let output_file = File::create(output_path.as_path()).expect("Unable to create output file.");
-    let mut output_writer = BufWriter::new(output_file);
-
-    let mut gpx = gpx::read(input_file_contents.as_slice()).expect("Could not parse GPX file.");
-
-    info!("Reversing tracks...");
-    reverser::reverse_all_tracks(&mut gpx, args.rename_strategy, args.keep_original);
-
-    gpx::write(&gpx, &mut output_writer).expect("Failed to write GPX file.");
-    output_writer.flush().expect("Error writing to output file");
-
-    info!("Finished reversing tracks. Wrote output to '{}'.", output_path.display())
+    single_gpx_file_cli::read_and_write_gpx_file(args.input, args.output, |gpx| {
+        info!("Reversing tracks...");
+        reverser::reverse_all_tracks(gpx, args.rename_strategy, args.keep_original);
+        Ok(())
+    })
 }
