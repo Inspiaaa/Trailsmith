@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     match args.command {
         Command::Clean(args) => gpx_clean::cli::run_cli_with_args(args)?,
-        Command::ReducePoints(args) => gpx_reduce_points::cli::run_cli_with_args(args),
+        Command::ReducePoints(args) => gpx_reduce_points::cli::run_cli_with_args(args)?,
         Command::GpxToKml(args) => gpx_to_kml::cli::run_cli_with_args(args),
         Command::MergeFiles(args) => gpx_merge_files::cli::run_cli_with_args(args)?,
         Command::ReverseTracks(args) => gpx_reverse_tracks::cli::run_cli_with_args(args),

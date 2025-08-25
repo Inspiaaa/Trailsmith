@@ -1,12 +1,13 @@
 use super::simplifier;
 use super::simplifier::{SimplificationMethod, SolverConfig};
-use crate::util;
+use crate::{error_messages, util};
 use clap::{Parser, ValueEnum};
 use log::info;
 use std::fs;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
+use anyhow::Context;
 
 const DEFAULT_VW_EPSILON: f64 = 0.0001;
 const DEFAULT_RDP_EPSILON: f64 = 0.001;
@@ -49,29 +50,26 @@ pub struct Args {
     quiet: bool,
 }
 
-pub fn run_cli() {
+pub fn run_cli() -> Result<(), anyhow::Error> {
     let args = Args::parse();
-    run_cli_with_args(args);
+    run_cli_with_args(args)
 }
 
-pub fn run_cli_with_args(args: Args) {
+pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
     util::setup_logging(args.quiet);
 
     let input_path = args.input;
-    let mut output_path = args.output;
-
-    if output_path.is_dir() {
-        output_path = output_path.join(input_path.file_name().expect("Input path malformed."));
-    }
+    let output_path = util::process_output_path(args.output, &input_path)?;
 
     info!("Loading input file...");
+    let input_file_contents = fs::read(input_path)
+        .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
 
-    let input_file_contents = fs::read(input_path).expect("Could not read input file.");
-    let output_file = File::create(output_path.as_path()).expect("Unable to create output file.");
-    let mut output_writer = BufWriter::new(output_file);
+    info!("Parsing GPX file...");
+    let mut gpx = gpx::read(input_file_contents.as_slice())
+        .with_context(|| error_messages::GPX_PARSE_ERROR)?;
 
     info!("Simplifying...");
-
     let method = match args.algorithm {
         AlgorithmOption::RDP => SimplificationMethod::RamerDouglasPeucker,
         AlgorithmOption::VW => SimplificationMethod::VisvalingamWhyatt,
@@ -88,17 +86,17 @@ pub fn run_cli_with_args(args: Args) {
         method,
         initial_epsilon,
     };
+    
+    simplifier::simplify_all_tracks_in_gpx(&mut gpx, &solver_config);
 
-    simplifier::simplify_all_tracks_in_file(
-        input_file_contents.as_slice(),
-        &mut output_writer,
-        &solver_config,
-    );
+    info!("Writing output to {}...", output_path.display());
+    let output_file = File::create(output_path.as_path())
+        .with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
+    let mut output_writer = BufWriter::new(output_file);
 
-    output_writer.flush().expect("Error writing to output file");
+    gpx::write(&gpx, &mut output_writer).with_context(|| error_messages::GPX_SERIALIZE_ERROR)?;
 
-    info!(
-        "Finished simplification. Wrote output to '{}'.",
-        output_path.display()
-    )
+    output_writer.flush().with_context(|| error_messages::OUTPUT_FILE_WRITE_ERROR)?;
+
+    Ok(())
 }

@@ -17,25 +17,7 @@ pub struct SolverConfig {
     pub initial_epsilon: f64,
 }
 
-pub fn simplify_all_tracks_in_file(
-    input_file: impl io::Read,
-    output_file: impl io::Write,
-    solver_config: &SolverConfig,
-) {
-    info!("Parsing GPX...");
-    let mut gpx = gpx::read(input_file).expect("Failed to parse GPX file.");
-    simplify_all_tracks_in_gpx_mut(&mut gpx, solver_config);
-    info!("Writing output...");
-    gpx::write(&gpx, output_file).expect("Failed to write GPX file.");
-}
-
-pub fn simplify_all_tracks_in_gpx(gpx: gpx::Gpx, solver_config: &SolverConfig) -> gpx::Gpx {
-    let mut result = gpx.clone();
-    simplify_all_tracks_in_gpx_mut(&mut result, solver_config);
-    result
-}
-
-pub fn simplify_all_tracks_in_gpx_mut(gpx: &mut gpx::Gpx, solver_config: &SolverConfig) {
+pub fn simplify_all_tracks_in_gpx(gpx: &mut gpx::Gpx, solver_config: &SolverConfig) {
     info!("Found {} track(s):", gpx.tracks.len());
 
     for track in gpx.tracks.iter_mut() {
