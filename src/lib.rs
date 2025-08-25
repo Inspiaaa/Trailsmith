@@ -23,6 +23,7 @@ pub mod gpx_reverse_tracks {
     pub mod reverser;
 }
 
-pub(crate) mod util;
+pub mod util;
 
-pub(crate) mod error_messages;
+pub mod error_messages;
+mod single_gpx_file_cli;

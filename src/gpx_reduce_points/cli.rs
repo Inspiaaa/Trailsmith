@@ -1,6 +1,6 @@
 use super::simplifier;
 use super::simplifier::{SimplificationMethod, SolverConfig};
-use crate::{error_messages, util};
+use crate::{error_messages, single_gpx_file_cli, util};
 use clap::{Parser, ValueEnum};
 use log::info;
 use std::fs;
@@ -58,45 +58,27 @@ pub fn run_cli() -> Result<(), anyhow::Error> {
 pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
     util::setup_logging(args.quiet);
 
-    let input_path = args.input;
-    let output_path = util::process_output_path(args.output, &input_path)?;
+    single_gpx_file_cli::read_and_write_gpx_file(args.input, args.output, |gpx| {
+        info!("Simplifying...");
+        let method = match args.algorithm {
+            AlgorithmOption::RDP => SimplificationMethod::RamerDouglasPeucker,
+            AlgorithmOption::VW => SimplificationMethod::VisvalingamWhyatt,
+        };
 
-    info!("Loading input file...");
-    let input_file_contents = fs::read(input_path)
-        .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
+        let initial_epsilon = args.epsilon.unwrap_or(match args.algorithm {
+            AlgorithmOption::RDP => DEFAULT_RDP_EPSILON,
+            AlgorithmOption::VW => DEFAULT_VW_EPSILON,
+        });
 
-    info!("Parsing GPX file...");
-    let mut gpx = gpx::read(input_file_contents.as_slice())
-        .with_context(|| error_messages::GPX_PARSE_ERROR)?;
+        let solver_config = SolverConfig {
+            max_points: args.max_points,
+            max_iterations: args.max_iterations,
+            method,
+            initial_epsilon,
+        };
 
-    info!("Simplifying...");
-    let method = match args.algorithm {
-        AlgorithmOption::RDP => SimplificationMethod::RamerDouglasPeucker,
-        AlgorithmOption::VW => SimplificationMethod::VisvalingamWhyatt,
-    };
+        simplifier::simplify_all_tracks_in_gpx(gpx, &solver_config);
 
-    let initial_epsilon = args.epsilon.unwrap_or(match args.algorithm {
-        AlgorithmOption::RDP => DEFAULT_RDP_EPSILON,
-        AlgorithmOption::VW => DEFAULT_VW_EPSILON,
-    });
-
-    let solver_config = SolverConfig {
-        max_points: args.max_points,
-        max_iterations: args.max_iterations,
-        method,
-        initial_epsilon,
-    };
-    
-    simplifier::simplify_all_tracks_in_gpx(&mut gpx, &solver_config);
-
-    info!("Writing output to {}...", output_path.display());
-    let output_file = File::create(output_path.as_path())
-        .with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
-    let mut output_writer = BufWriter::new(output_file);
-
-    gpx::write(&gpx, &mut output_writer).with_context(|| error_messages::GPX_SERIALIZE_ERROR)?;
-
-    output_writer.flush().with_context(|| error_messages::OUTPUT_FILE_WRITE_ERROR)?;
-
-    Ok(())
+        Ok(())
+    })
 }
