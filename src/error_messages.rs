@@ -3,3 +3,4 @@ pub const INPUT_FILE_READ_ERROR: &str = "Could not read from input file.";
 pub const GPX_PARSE_ERROR: &str = "Could not parse GPX file.";
 pub const GPX_SERIALIZE_ERROR: &str = "Could not serialize GPX file.";
 pub const OUTPUT_FILE_WRITE_ERROR: &str = "Could not write to output file.";
+pub const OUTPUT_FILE_CREATION_ERROR: &str = "Could not create output file.";
