@@ -10,7 +10,7 @@ pub mod gpx_reduce_points {
 
 pub mod gpx_to_kml {
     pub mod cli;
-    pub mod convert;
+    pub mod converter;
 }
 
 pub mod gpx_merge_files {
