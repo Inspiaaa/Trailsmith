@@ -7,6 +7,10 @@ use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 
+// Helper functions that perform common tasks for the CLIs, such as reading and writing
+// the GPX file, enabling consistent behaviour between the CLIs and reducing the work
+// to create new tools.
+
 pub fn read_and_write_gpx_file<F>(
     input_path: PathBuf,
     output_path: PathBuf,
