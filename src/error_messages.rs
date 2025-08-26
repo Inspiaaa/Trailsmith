@@ -5,3 +5,4 @@ pub const GPX_SERIALIZE_ERROR: &str = "Could not serialize GPX file.";
 pub const OUTPUT_FILE_WRITE_ERROR: &str = "Could not write to output file.";
 pub const OUTPUT_FILE_CREATION_ERROR: &str = "Could not create output file.";
 pub const KML_SERIALIZE_ERROR: &str = "Could not serialize KML file.";
+pub const OUTPUT_PATH_IS_NOT_FOLDER: &str = "Output folder is not a directory.";

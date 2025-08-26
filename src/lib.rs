@@ -38,6 +38,11 @@ pub mod gpx_minify {
     pub mod minifier;
 }
 
+pub mod gpx_split_file {
+    pub mod cli;
+    pub mod splitter;
+}
+
 pub mod util;
 
 pub mod error_messages;
