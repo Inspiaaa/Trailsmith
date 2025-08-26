@@ -22,7 +22,7 @@ enum Command {
     /// Convert GPX routes into tracks.
     RoutesToTracks(gpx_routes_to_tracks::cli::Args),
 
-    /// Minifies a GPX file by removing whitespace to reduce the file size.
+    /// Minify a GPX file by removing whitespace to reduce the file size.
     Minify(gpx_minify::cli::Args),
 
     /// Merge multiple GPX files into a single file.
@@ -31,7 +31,7 @@ enum Command {
     /// Merge all tracks within a GPX file.
     MergeTracks(gpx_merge_tracks::cli::Args),
 
-    /// Splits waypoints, tracks, and routes from a GPX file into separate files.
+    /// Split waypoints, tracks, and routes from a GPX file into separate files.
     SplitFile(gpx_split_file::cli::Args),
 }
 
