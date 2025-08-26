@@ -115,8 +115,7 @@ pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
 
     info!("Serializing GPX file...");
     let mut output = Vec::new();
-    gpx::write(&gpx, &mut output)
-        .with_context(|| error_messages::GPX_SERIALIZE_ERROR)?;
+    gpx::write(&gpx, &mut output).with_context(|| error_messages::GPX_SERIALIZE_ERROR)?;
 
     if args.encoding == EncodingOption::Ascii {
         info!("Converting to ASCII...");
