@@ -1,6 +1,6 @@
 use super::converter;
 use super::converter::LineStyleConfig;
-use crate::{error_messages, single_gpx_file_cli, util};
+use crate::{error_messages, gpx_cli_util, util};
 use clap::Parser;
 use log::info;
 use std::fs::File;
@@ -48,7 +48,7 @@ pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
         Some(path) => process_output_path(path, &input_path)?.with_extension("kml"),
     };
 
-    let gpx = single_gpx_file_cli::read_gpx_file(&input_path)?;
+    let gpx = gpx_cli_util::read_input_gpx_file(&input_path)?;
 
     info!("Converting to KML...");
     let line_style = LineStyleConfig {

@@ -41,4 +41,4 @@ pub mod gpx_minify {
 pub mod util;
 
 pub mod error_messages;
-mod single_gpx_file_cli;
+mod gpx_cli_util;

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use clap::Parser;
 use log::info;
-use crate::{single_gpx_file_cli, util};
+use crate::{gpx_cli_util, util};
 use super::converter;
 
 #[derive(Parser)]
@@ -30,7 +30,7 @@ pub fn run_cli() -> anyhow::Result<()> {
 pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
     util::setup_logging(args.quiet);
 
-    single_gpx_file_cli::read_and_write_gpx_file(args.input, args.output, |gpx| {
+    gpx_cli_util::read_and_write_gpx_file(args.input, args.output, |gpx| {
         info!("Converting routes...");
 
         converter::convert_all_routes_to_tracks(gpx);

@@ -1,6 +1,6 @@
 use super::simplifier;
 use super::simplifier::{SimplificationMethod, SolverConfig};
-use crate::{single_gpx_file_cli, util};
+use crate::{gpx_cli_util, util};
 use clap::{Parser, ValueEnum};
 use log::info;
 use std::path::PathBuf;
@@ -54,7 +54,7 @@ pub fn run_cli() -> Result<(), anyhow::Error> {
 pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
     util::setup_logging(args.quiet);
 
-    single_gpx_file_cli::read_and_write_gpx_file(args.input, args.output, |gpx| {
+    gpx_cli_util::read_and_write_gpx_file(args.input, args.output, |gpx| {
         info!("Simplifying...");
         let method = match args.algorithm {
             AlgorithmOption::RDP => SimplificationMethod::RamerDouglasPeucker,

@@ -3,7 +3,7 @@ use clap::Parser;
 use log::info;
 use super::reverser;
 use super::reverser::RenameStrategy;
-use crate::{single_gpx_file_cli, util};
+use crate::{gpx_cli_util, util};
 
 #[derive(Parser)]
 pub struct Args {
@@ -35,7 +35,7 @@ pub fn run_cli() -> anyhow::Result<()> {
 pub fn run_cli_with_args(args: Args) -> anyhow::Result<()> {
     util::setup_logging(args.quiet);
 
-    single_gpx_file_cli::read_and_write_gpx_file(args.input, args.output, |gpx| {
+    gpx_cli_util::read_and_write_gpx_file(args.input, args.output, |gpx| {
         info!("Reversing tracks...");
         reverser::reverse_all_tracks(gpx, args.rename_strategy, args.keep_original);
         Ok(())

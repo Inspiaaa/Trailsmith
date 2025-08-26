@@ -4,7 +4,7 @@ use anyhow::Context;
 use clap::Parser;
 use log::info;
 use super::merger;
-use crate::{error_messages, single_gpx_file_cli, util};
+use crate::{error_messages, gpx_cli_util, util};
 
 #[derive(Parser, Debug)]
 pub struct Args {
@@ -43,7 +43,7 @@ pub fn run_cli() -> Result<(), anyhow::Error> {
 pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
     util::setup_logging(args.quiet);
 
-    single_gpx_file_cli::read_and_write_gpx_file(args.master, args.output, |master_gpx| {
+    gpx_cli_util::read_and_write_gpx_file(args.master, args.output, |master_gpx| {
         info!("Merging files...");
 
         for other_path in args.files {
