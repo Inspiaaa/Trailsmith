@@ -2,8 +2,9 @@ use crate::error_messages;
 use anyhow::Context;
 use log::info;
 use std::borrow::Cow;
+use std::fs;
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Write};
+use std::io::{BufWriter, Write};
 use std::path::Path;
 use xml::attribute::{Attribute, OwnedAttribute};
 use xml::reader::XmlEvent;
@@ -15,16 +16,15 @@ use xml::writer::XmlEvent as WriterEvent;
 pub fn minify(input_path: &Path, output_path: &Path) -> anyhow::Result<()> {
     info!("Writing output to {}...", output_path.display());
 
-    let input_file =
-        File::open(input_path).with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
+    let input_file_contents =
+        fs::read(input_path).with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
+
     let output_file =
         File::create(output_path).with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
 
-    let reader = BufReader::new(input_file);
+    let parser = EventReader::new(input_file_contents.as_slice());
+
     let mut writer = BufWriter::new(output_file);
-
-    let parser = EventReader::new(reader);
-
     let mut emitter = EmitterConfig::new()
         .perform_indent(false)
         .create_writer(&mut writer);
