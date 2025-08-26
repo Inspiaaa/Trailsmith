@@ -1,6 +1,6 @@
 use std::error::Error;
 use clap::{Parser, Subcommand};
-use gpx_tools::{gpx_clean, gpx_merge_files, gpx_merge_tracks, gpx_reduce_points, gpx_reverse_tracks, gpx_routes_to_tracks, gpx_to_kml};
+use gpx_tools::{gpx_clean, gpx_merge_files, gpx_merge_tracks, gpx_minify, gpx_reduce_points, gpx_reverse_tracks, gpx_routes_to_tracks, gpx_to_kml};
 
 #[derive(Subcommand)]
 enum Command {
@@ -24,6 +24,9 @@ enum Command {
 
     /// Convert GPX routes into tracks.
     RoutesToTracks(gpx_routes_to_tracks::cli::Args),
+
+    /// Minifies a GPX file by removing whitespace to reduce the file size.
+    Minify(gpx_minify::cli::Args),
 }
 
 #[derive(Parser)]
@@ -43,6 +46,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::ReverseTracks(args) => gpx_reverse_tracks::cli::run_cli_with_args(args)?,
         Command::RoutesToTracks(args) => gpx_routes_to_tracks::cli::run_cli_with_args(args)?,
         Command::MergeTracks(args) => gpx_merge_tracks::cli::run_cli_with_args(args)?,
+        Command::Minify(args) => gpx_minify::cli::run_cli_with_args(args)?,
     }
 
     Ok(())

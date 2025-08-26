@@ -33,6 +33,11 @@ pub mod gpx_routes_to_tracks {
     pub mod converter;
 }
 
+pub mod gpx_minify {
+    pub mod cli;
+    pub mod minifier;
+}
+
 pub mod util;
 
 pub mod error_messages;
