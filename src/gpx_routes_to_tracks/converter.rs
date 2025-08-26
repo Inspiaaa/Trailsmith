@@ -15,8 +15,8 @@ pub fn convert_route_to_track(route: &Route) -> Track {
         links: route.links.clone(),
         type_: route.type_.clone(),
         number: route.number,
-        segments: vec![TrackSegment{
+        segments: vec![TrackSegment {
             points: route.points.clone(),
-        }]
+        }],
     }
 }

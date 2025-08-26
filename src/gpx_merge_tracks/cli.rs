@@ -1,8 +1,8 @@
-use std::path::PathBuf;
+use crate::gpx_merge_tracks::merger;
+use crate::{gpx_cli_util, util};
 use clap::Parser;
 use log::info;
-use crate::{gpx_cli_util, util};
-use crate::gpx_merge_tracks::merger;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 pub struct Args {
@@ -19,7 +19,7 @@ pub struct Args {
 
     /// Name for the resulting merged track.
     #[arg(short = 'n', long = "name")]
-    name: String
+    name: String,
 }
 
 pub fn run_cli() -> Result<(), anyhow::Error> {

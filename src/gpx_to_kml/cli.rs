@@ -1,13 +1,13 @@
 use super::converter;
 use super::converter::LineStyleConfig;
+use crate::util::process_output_path;
 use crate::{error_messages, gpx_cli_util, util};
+use anyhow::Context;
 use clap::Parser;
 use log::info;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-use anyhow::Context;
-use crate::util::process_output_path;
 
 // Src for the GPX-->KML code: https://github.com/vilaureu/gpx_kml_convert/tree/master
 

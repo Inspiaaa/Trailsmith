@@ -1,9 +1,9 @@
-use std::path::PathBuf;
-use clap::Parser;
-use log::info;
 use super::reverser;
 use super::reverser::RenameStrategy;
 use crate::{gpx_cli_util, util};
+use clap::Parser;
+use log::info;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 pub struct Args {

@@ -1,10 +1,10 @@
 use crate::error_messages;
 use anyhow::Context;
+use log::info;
 use std::borrow::Cow;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Write};
 use std::path::Path;
-use log::info;
 use xml::attribute::{Attribute, OwnedAttribute};
 use xml::reader::XmlEvent;
 use xml::{EmitterConfig, EventReader};
@@ -32,17 +32,22 @@ pub fn minify(input_path: &Path, output_path: &Path) -> anyhow::Result<()> {
     for event in parser {
         let event = event.with_context(|| error_messages::GPX_PARSE_ERROR)?;
         let result = match event {
-            XmlEvent::StartElement { name, attributes, namespace} => {
-                let cloned_attributes: Vec<Attribute> = attributes.iter().map(OwnedAttribute::borrow).collect();
+            XmlEvent::StartElement {
+                name,
+                attributes,
+                namespace,
+            } => {
+                let cloned_attributes: Vec<Attribute> =
+                    attributes.iter().map(OwnedAttribute::borrow).collect();
                 emitter.write(WriterEvent::StartElement {
                     name: name.borrow(),
                     attributes: Cow::Borrowed(cloned_attributes.as_slice()),
                     namespace: Cow::Owned(namespace),
                 })
             }
-            XmlEvent::EndElement { name } => {
-                emitter.write(WriterEvent::EndElement { name: Some(name.borrow()) })
-            },
+            XmlEvent::EndElement { name } => emitter.write(WriterEvent::EndElement {
+                name: Some(name.borrow()),
+            }),
             XmlEvent::Characters(text) => emitter.write(WriterEvent::Characters(&text)),
             XmlEvent::CData(text) => emitter.write(WriterEvent::CData(&text)),
             XmlEvent::ProcessingInstruction { name, data } => {
@@ -51,7 +56,11 @@ pub fn minify(input_path: &Path, output_path: &Path) -> anyhow::Result<()> {
                     data: data.as_deref(),
                 })
             }
-            XmlEvent::StartDocument { version, encoding, standalone } => emitter.write(WriterEvent::StartDocument {
+            XmlEvent::StartDocument {
+                version,
+                encoding,
+                standalone,
+            } => emitter.write(WriterEvent::StartDocument {
                 version,
                 encoding: Some(&encoding),
                 standalone,

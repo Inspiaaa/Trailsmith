@@ -108,7 +108,6 @@ fn get_auto_path_for_waypoints(
     output_folder.join(file_name)
 }
 
-
 pub fn save_track_to_file(
     track: &Track,
     output_path: &Path,

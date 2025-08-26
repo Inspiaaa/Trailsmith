@@ -1,8 +1,8 @@
-use std::path::PathBuf;
+use super::converter;
+use crate::{gpx_cli_util, util};
 use clap::Parser;
 use log::info;
-use crate::{gpx_cli_util, util};
-use super::converter;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 pub struct Args {

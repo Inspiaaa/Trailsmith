@@ -5,7 +5,7 @@ pub fn merge_tracks(gpx: &mut Gpx, merged_name: String) {
         name: Some(merged_name),
         ..Default::default()
     };
-    
+
     gpx.tracks.reverse();
     while let Some(mut track) = gpx.tracks.pop() {
         track.segments.reverse();

@@ -27,12 +27,12 @@ use std::collections::HashMap;
 use std::fmt::Write;
 use std::io;
 
-use gpx::{errors::GpxError, Gpx, Link, Metadata, Route, Track, TrackSegment, Waypoint};
+use gpx::{Gpx, Link, Metadata, Route, Track, TrackSegment, Waypoint, errors::GpxError};
 use kml::types::{
     AltitudeMode, ColorMode, Coord, Geometry, LineString, LineStyle, MultiGeometry, Placemark,
     Point, Style,
 };
-use kml::{types::Element, Kml, KmlDocument, KmlVersion, KmlWriter};
+use kml::{Kml, KmlDocument, KmlVersion, KmlWriter, types::Element};
 use thiserror::Error;
 
 /// This line needs to be prepended to the KML output.

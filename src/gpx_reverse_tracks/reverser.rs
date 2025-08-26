@@ -61,7 +61,7 @@ pub fn reverse_track(track: &mut Track, rename_strategy: RenameStrategy) {
                 .name
                 .as_ref()
                 .map_or_else(|| "Reversed".to_string(), |n| n.to_string() + " Reversed"),
-        )
+        ),
     }
 }
 

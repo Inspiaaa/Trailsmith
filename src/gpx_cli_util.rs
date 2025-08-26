@@ -30,17 +30,16 @@ where
 
 pub fn read_input_gpx_file(input_path: &Path) -> anyhow::Result<Gpx> {
     info!("Loading input file...");
-    let input_file_contents = fs::read(input_path)
-        .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
+    let input_file_contents =
+        fs::read(input_path).with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
 
     info!("Parsing GPX file...");
-    gpx::read(input_file_contents.as_slice())
-        .with_context(|| error_messages::GPX_PARSE_ERROR)
+    gpx::read(input_file_contents.as_slice()).with_context(|| error_messages::GPX_PARSE_ERROR)
 }
 
 pub fn write_gpx_file(gpx: &Gpx, output_path: &Path) -> anyhow::Result<()> {
-    let output_file = File::create(output_path)
-        .with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
+    let output_file =
+        File::create(output_path).with_context(|| error_messages::OUTPUT_FILE_CREATION_ERROR)?;
     let mut output_writer = BufWriter::new(output_file);
 
     gpx::write(&gpx, &mut output_writer).with_context(|| error_messages::GPX_SERIALIZE_ERROR)?;

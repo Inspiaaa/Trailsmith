@@ -1,10 +1,10 @@
-use std::fs;
-use std::path::PathBuf;
+use super::merger;
+use crate::{error_messages, gpx_cli_util, util};
 use anyhow::Context;
 use clap::Parser;
 use log::info;
-use super::merger;
-use crate::{error_messages, gpx_cli_util, util};
+use std::fs;
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 pub struct Args {
@@ -48,8 +48,8 @@ pub fn run_cli_with_args(args: Args) -> Result<(), anyhow::Error> {
 
         for other_path in args.files {
             info!("  {}", other_path.display());
-            let other_file_contents = fs::read(other_path)
-                .with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
+            let other_file_contents =
+                fs::read(other_path).with_context(|| error_messages::INPUT_FILE_READ_ERROR)?;
             let other_gpx = gpx::read(other_file_contents.as_slice())
                 .with_context(|| error_messages::GPX_PARSE_ERROR)?;
 

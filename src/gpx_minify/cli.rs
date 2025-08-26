@@ -1,7 +1,7 @@
-use std::path::PathBuf;
-use clap::Parser;
-use crate::util;
 use super::minifier;
+use crate::util;
+use clap::Parser;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 pub struct Args {
