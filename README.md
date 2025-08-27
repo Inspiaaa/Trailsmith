@@ -1,6 +1,31 @@
 # CLI GPX Tools
 
-GpxTools is a collection of lightweight, fast, and easy-to-use command-line utilities for processing and transforming GPX files, built with Rust. Whether you're cleaning up GPS data, converting formats, or optimizing tracks, GpxTools helps you streamline your GPX workflows with minimal effort.
+Trailsmith is a collection of lightweight, fast, and easy-to-use command-line utilities for processing and transforming GPX files, built with Rust. Whether you're cleaning up GPS data, converting formats, or optimizing tracks, Trailsmith helps you streamline your GPX workflows with minimal effort.
+
+All tools are unified to a single command line interface via subcommands.
+
+**Help:**
+
+```
+A collection of command-line tools for working with GPX files
+
+Usage: trailsmith.exe <COMMAND>
+
+Commands:
+  clean             Fix encoding errors, remove metadata and features, change track names
+  reduce-points     Reduce the number of points in tracks
+  gpx-to-kml        Convert a GPX file to KML format
+  reverse-tracks    Reverse the order of track points in all tracks
+  routes-to-tracks  Convert GPX routes into tracks
+  minify            Minify a GPX file by removing whitespace to reduce the file size
+  merge-files       Merge multiple GPX files into a single file
+  merge-tracks      Merge all tracks within a GPX file
+  split-file        Split waypoints, tracks, and routes from a GPX file into separate files
+  help              Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+```
 
 ## Reducing Track Point Count
 
@@ -8,7 +33,7 @@ GpxTools is a collection of lightweight, fast, and easy-to-use command-line util
 
 ```
 mkdir simplified
-./gpx_reduce_points.exe my_gpx_file.gpx -o ./simplified -n 500
+./trailsmith.exe my_gpx_file.gpx -o ./simplified -n 500
 ```
 
 You can specify either an output folder or an exact path (including filename) for the output file.
@@ -16,7 +41,9 @@ You can specify either an output folder or an exact path (including filename) fo
 **Help:**
 
 ```
-Usage: gpx_reduce_points.exe [OPTIONS] --output <OUTPUT> --points <MAX_POINTS> <INPUT>
+Reduce the number of points in tracks
+
+Usage: trailsmith.exe reduce-points [OPTIONS] --output <OUTPUT> --points <MAX_POINTS> <INPUT>
 
 Arguments:
   <INPUT>
@@ -58,7 +85,7 @@ Options:
 **Example:**
 
 ```
-./gpx_to_kml.exe my_gpx_file.gpx
+./trailsmith.exe gpx-to-kml my_gpx_file.gpx
 ```
 
 You can specify either an output folder or an exact path (including filename) for the output file.
@@ -66,7 +93,9 @@ You can specify either an output folder or an exact path (including filename) fo
 **Help:**
 
 ```
-Usage: gpx_to_kml.exe [OPTIONS] <INPUT>
+Convert a GPX file to KML format
+
+Usage: trailsmith.exe gpx-to-kml [OPTIONS] <INPUT>
 
 Arguments:
   <INPUT>  Input GPX file
@@ -76,7 +105,7 @@ Options:
   -q, --quiet               Quite: Disable logging
   -c, --color <LINE_COLOR>  Line color. Remember to include the alpha value at the end [default: #FF4136FF]
   -w, --width <LINE_WIDTH>  Line width [default: 1.0]
-  -h, --help                Print help
+  -h, --help                Print help            Print help
 ```
 
 ## Cleaning GPX Files
@@ -89,25 +118,31 @@ Options:
 **Example:** Convert to ASCII, but keep all information:
 
 ```
-./gpx_clean.exe my_gpx_file.gpx -o clean.gpx
+./trailsmith.exe clean my_gpx_file.gpx -o clean.gpx
 ```
 
 **Example:** Removing all metadata:
 
 ```
-./gpx_clean.exe my_gpx_file.gpx -o clean.gpx --set-creator Inspiaaa --set-version 1.1 --remove-metadata --remove-track-metadata --remove-track-point-metadata --remove-route-metadata --remove-route-point-metadata
+./trailsmith.exe clean my_gpx_file.gpx -o clean.gpx --set-creator "Inspiaaa" --set-version 1.1 --remove-metadata --remove-track-metadata --remove-track-point-metadata --remove-route-metadata --remove-route-point-metadata
 ```
 
 **Example:** Removing routes and waypoints:
 
 ```
-./gpx_clean.exe my_gpx_file.gpx -o clean.gpx --remove-routes --remove-waypoints
+./trailsmith.exe clean my_gpx_file.gpx -o clean.gpx --remove-routes --remove-waypoints
 ```
 
-**Example:** Renaming all tracks: Interactive, asks you for a new name for each track:
+**Example:** Removing elevation data:
 
 ```
-./gpx_clean.exe my_gpx_file.gpx -o clean.gpx --rename-tracks
+./trailsmith.exe clean my_gpx_file.gpx -o clean.gpx --remove-track-elevation --remove-route-elevation
+```
+
+**Example:** Renaming all tracks: Interactively asks you for a new name for each track:
+
+```
+./trailsmith.exe clean my_gpx_file.gpx -o clean.gpx --rename-tracks
 ```
 
 Example console output during rename operation:
@@ -131,11 +166,13 @@ Rename tracks:
 **Help:**
 
 ```
-Usage: gpx_clean.exe [OPTIONS] --output <OUTPUT> <INPUT>
+Fix encoding errors, remove metadata and features, change track names
+
+Usage: trailsmith.exe clean [OPTIONS] --output <OUTPUT> <INPUT>
 
 Arguments:
   <INPUT>
-          Input GPX file
+          Input GPX file path
 
 Options:
   -o, --output <OUTPUT>
@@ -160,10 +197,10 @@ Options:
           [default: ignore]
 
       --set-creator <SET_CREATOR>
-          Sets the "creator" field (software / person who made the GPX file)
+          Set the "creator" field (software / person who made the GPX file)
 
       --set-version <SET_VERSION>
-          Sets the GPX file format version
+          Set the GPX file format version
 
           Possible values:
           - 1.1: Version 1.1
@@ -175,19 +212,19 @@ Options:
           Interactively rename each track
 
       --remove-waypoints
-          Removes all waypoints
+          Remove all waypoints
 
       --remove-tracks
-          Removes all tracks
+          Remove all tracks
 
       --remove-routes
-          Removes all routes
+          Remove all routes
 
       --remove-metadata
-          Removes all "general" GPX metadata
+          Remove all "general" GPX metadata
 
       --remove-track-metadata
-          Removes all general metadata (except for the name) from each track
+          Remove all general metadata (except for the name) from each track
 
       --remove-route-metadata
           Remove all general metadata (except for the name) from each route
@@ -198,6 +235,16 @@ Options:
       --remove-route-point-metadata
           Remove the metadata from each point of each route, only keeping lon, lat, and elevation
 
+      --remove-track-elevation
+          Remove the elevation data from each track point
+
+      --remove-route-elevation
+          Remove the elevation data from each route point
+
   -h, --help
           Print help (see a summary with '-h')
 ```
+
+## Additional Tools
+
+For more information on the additional tools provided by the CLI suite, please consult the `--help`.
