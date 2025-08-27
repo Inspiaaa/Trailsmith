@@ -35,6 +35,7 @@ enum Command {
     SplitFile(gpx_split_file::cli::Args),
 }
 
+/// A collection of command-line tools for working with GPX files.
 #[derive(Parser)]
 struct Cli {
     #[clap(subcommand)]
