@@ -2,13 +2,11 @@
 
 Trailsmith is a collection of lightweight, fast, and easy-to-use command-line utilities for processing and transforming GPX files, built with Rust. Whether you're cleaning up GPS data, converting formats, or optimizing tracks, Trailsmith helps you streamline your GPX workflows with minimal effort.
 
-All tools are unified to a single command line interface via subcommands.
+All tools are available through a unified command-line interface via subcommands. Alternatively, you can build and use each tool independently by compiling from source.
 
-**Help:**
+## Usage
 
 ```
-A collection of command-line tools for working with GPX files
-
 Usage: trailsmith.exe <COMMAND>
 
 Commands:
@@ -27,7 +25,21 @@ Options:
   -h, --help  Print help
 ```
 
-## Reducing Track Point Count
+### Building from Source
+
+To build Trailsmith from source, ensure you have [Rust and Cargo](https://www.rust-lang.org/tools/install) installed.
+
+```bash
+cargo build --release
+```
+
+This will generate:
+- A single CLI binary (`trailsmith`) with all subcommands
+- Individual executables for each tool, e.g. `gpx_reduce_points.exe`
+
+## Examples
+
+### Reducing Track Point Count
 
 **Example:** Reduce the point count of each track to 500 points:
 
@@ -80,7 +92,7 @@ Options:
           Print help (see a summary with '-h')
 ```
 
-## Converting GPX --> KML
+### Converting GPX --> KML
 
 **Example:**
 
@@ -108,7 +120,7 @@ Options:
   -h, --help                Print help            Print help
 ```
 
-## Cleaning GPX Files
+### Cleaning GPX Files
 
 **Features:**
 - Remove non-ASCII chars
@@ -245,6 +257,6 @@ Options:
           Print help (see a summary with '-h')
 ```
 
-## Additional Tools
+### Additional Tools
 
 For more information on the additional tools provided by the CLI suite, please consult the `--help`.
