@@ -20,6 +20,7 @@ Commands:
   merge-files       Merge multiple GPX files into a single file
   merge-tracks      Merge all tracks within a GPX file
   split-file        Split waypoints, tracks, and routes from a GPX file into separate files
+  info              Print summary stats and metadata from GPX tracks, routes, and waypoints
   help              Print this message or the help of the given subcommand(s)
 
 Options:
