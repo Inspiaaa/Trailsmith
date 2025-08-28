@@ -46,8 +46,6 @@ fn convert_placemark(placemark: &Placemark<f64>, gpx: &mut Gpx) {
         return;
     };
 
-    // let collection: GeometryCollection<f64> = Kml::Placemark(placemark.clone()).try_into().unwrap();
-
     let name = placemark.name.clone();
     let description = placemark.description.clone();
 
@@ -89,7 +87,7 @@ fn convert_geometry_for_track(geometry: &KmlGeometry, track: &mut Track) {
             }
         }
         _ => {
-            warn!("  Unsupported geometry type: {:?}", geometry);
+            warn!("Unsupported geometry type: {:?}", geometry);
         }
     }
 }
