@@ -48,6 +48,11 @@ pub mod kml_to_gpx {
     pub mod converter;
 }
 
+pub mod gpx_info {
+    pub mod cli;
+    pub mod info;
+}
+
 pub mod util;
 
 pub mod error_messages;

@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use gpx_tools::{gpx_clean, gpx_merge_files, gpx_merge_tracks, gpx_minify, gpx_reduce_points, gpx_reverse_tracks, gpx_routes_to_tracks, gpx_split_file, gpx_to_kml, kml_to_gpx};
+use gpx_tools::{gpx_clean, gpx_info, gpx_merge_files, gpx_merge_tracks, gpx_minify, gpx_reduce_points, gpx_reverse_tracks, gpx_routes_to_tracks, gpx_split_file, gpx_to_kml, kml_to_gpx};
 use std::error::Error;
 
 #[derive(Subcommand)]
@@ -33,6 +33,9 @@ enum Command {
 
     /// Split waypoints, tracks, and routes from a GPX file into separate files.
     SplitFile(gpx_split_file::cli::Args),
+
+    /// Print summary stats and metadata from GPX tracks, routes, and waypoints.
+    Info(gpx_info::cli::Args),
 }
 
 /// A collection of command-line tools for working with GPX files.
@@ -56,6 +59,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::MergeTracks(args) => gpx_merge_tracks::cli::run_cli_with_args(args)?,
         Command::Minify(args) => gpx_minify::cli::run_cli_with_args(args)?,
         Command::SplitFile(args) => gpx_split_file::cli::run_cli_with_args(args)?,
+        Command::Info(args) => gpx_info::cli::run_cli_with_args(args)?,
     }
 
     Ok(())
