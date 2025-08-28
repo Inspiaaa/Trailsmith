@@ -1,7 +1,7 @@
 use geo::{Coord, Point};
 use gpx::{Gpx, GpxVersion, Track, TrackSegment, Waypoint};
-use kml::types::Placemark;
 use kml::Kml;
+use kml::types::Placemark;
 use log::warn;
 
 use kml::types as KmlTypes;
@@ -22,7 +22,7 @@ fn convert_kml_element(kml: &Kml<f64>, gpx: &mut Gpx) {
                 convert_kml_element(&element, gpx);
             }
         }
-        Kml::Document{ elements, .. } => {
+        Kml::Document { elements, .. } => {
             for entry in elements {
                 convert_kml_element(entry, gpx);
             }
@@ -80,7 +80,7 @@ fn convert_geometry_for_track(geometry: &KmlGeometry, track: &mut Track) {
         KmlGeometry::LineString(line) => {
             let segment = make_track_segment(line);
             track.segments.push(segment);
-        },
+        }
         KmlGeometry::MultiGeometry(geometry) => {
             for segment_geometry in &geometry.geometries {
                 convert_geometry_for_track(segment_geometry, track);
@@ -109,7 +109,5 @@ fn make_track_segment(line: &KmlTypes::LineString) -> TrackSegment {
         .map(|point| Waypoint::new(point.clone()))
         .collect();
 
-    TrackSegment {
-        points: waypoints,
-    }
+    TrackSegment { points: waypoints }
 }

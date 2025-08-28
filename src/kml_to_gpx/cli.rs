@@ -4,9 +4,9 @@ use crate::{error_messages, gpx_cli_util, util};
 use anyhow::Context;
 use clap::Parser;
 use kml::Kml;
+use log::info;
 use std::fs;
 use std::path::PathBuf;
-use log::info;
 
 #[derive(Parser)]
 pub struct Args {

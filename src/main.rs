@@ -1,5 +1,8 @@
 use clap::{Parser, Subcommand};
-use gpx_tools::{gpx_clean, gpx_info, gpx_merge_files, gpx_merge_tracks, gpx_minify, gpx_reduce_points, gpx_reverse_tracks, gpx_routes_to_tracks, gpx_split_file, gpx_to_kml, kml_to_gpx};
+use gpx_tools::{
+    gpx_clean, gpx_info, gpx_merge_files, gpx_merge_tracks, gpx_minify, gpx_reduce_points,
+    gpx_reverse_tracks, gpx_routes_to_tracks, gpx_split_file, gpx_to_kml, kml_to_gpx,
+};
 use std::error::Error;
 
 #[derive(Subcommand)]
