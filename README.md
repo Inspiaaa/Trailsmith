@@ -13,6 +13,7 @@ Commands:
   clean             Fix encoding errors, remove metadata and features, change track names
   reduce-points     Reduce the number of points in tracks
   gpx-to-kml        Convert a GPX file to KML format
+  kml-to-gpx        Convert a KML file to GPX format
   reverse-tracks    Reverse the order of track points in all tracks
   routes-to-tracks  Convert GPX routes into tracks
   minify            Minify a GPX file by removing whitespace to reduce the file size
