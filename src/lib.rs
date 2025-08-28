@@ -43,6 +43,11 @@ pub mod gpx_split_file {
     pub mod splitter;
 }
 
+pub mod kml_to_gpx {
+    pub mod cli;
+    pub mod converter;
+}
+
 pub mod util;
 
 pub mod error_messages;
