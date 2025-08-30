@@ -119,7 +119,7 @@ Options:
   -q, --quiet               Quite: Disable logging
   -c, --color <LINE_COLOR>  Line color. Remember to include the alpha value at the end [default: #FF4136FF]
   -w, --width <LINE_WIDTH>  Line width [default: 1.0]
-  -h, --help                Print help            Print help
+  -h, --help                Print help
 ```
 
 ### Cleaning GPX Files
